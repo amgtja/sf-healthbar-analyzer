@@ -38,10 +38,10 @@
             // 
             // FileSelectB
             // 
-            this.FileSelectB.Location = new System.Drawing.Point(385, 457);
+            this.FileSelectB.Location = new System.Drawing.Point(385, 422);
             this.FileSelectB.Margin = new System.Windows.Forms.Padding(2);
             this.FileSelectB.Name = "FileSelectB";
-            this.FileSelectB.Size = new System.Drawing.Size(196, 117);
+            this.FileSelectB.Size = new System.Drawing.Size(196, 108);
             this.FileSelectB.TabIndex = 0;
             this.FileSelectB.Text = "ファイル選択ボタン";
             this.FileSelectB.UseVisualStyleBackColor = true;
@@ -49,18 +49,18 @@
             // 
             // FileDisplay
             // 
-            this.FileDisplay.Location = new System.Drawing.Point(231, 11);
+            this.FileDisplay.Location = new System.Drawing.Point(231, 10);
             this.FileDisplay.Margin = new System.Windows.Forms.Padding(2);
             this.FileDisplay.Name = "FileDisplay";
-            this.FileDisplay.Size = new System.Drawing.Size(529, 20);
+            this.FileDisplay.Size = new System.Drawing.Size(529, 19);
             this.FileDisplay.TabIndex = 1;
             // 
             // ConfigB
             // 
-            this.ConfigB.Location = new System.Drawing.Point(84, 465);
+            this.ConfigB.Location = new System.Drawing.Point(84, 429);
             this.ConfigB.Margin = new System.Windows.Forms.Padding(2);
             this.ConfigB.Name = "ConfigB";
-            this.ConfigB.Size = new System.Drawing.Size(143, 109);
+            this.ConfigB.Size = new System.Drawing.Size(143, 101);
             this.ConfigB.TabIndex = 2;
             this.ConfigB.Text = "設定";
             this.ConfigB.UseVisualStyleBackColor = true;
@@ -68,16 +68,16 @@
             // 
             // AnalyzeB
             // 
-            this.AnalyzeB.Location = new System.Drawing.Point(712, 449);
+            this.AnalyzeB.Location = new System.Drawing.Point(712, 414);
             this.AnalyzeB.Name = "AnalyzeB";
-            this.AnalyzeB.Size = new System.Drawing.Size(182, 132);
+            this.AnalyzeB.Size = new System.Drawing.Size(182, 122);
             this.AnalyzeB.TabIndex = 3;
             this.AnalyzeB.Text = "解析ボタン";
             this.AnalyzeB.UseVisualStyleBackColor = true;
             // 
             // pictureBoxFrame
             // 
-            this.pictureBoxFrame.Location = new System.Drawing.Point(171, 52);
+            this.pictureBoxFrame.Location = new System.Drawing.Point(171, 48);
             this.pictureBoxFrame.Name = "pictureBoxFrame";
             this.pictureBoxFrame.Size = new System.Drawing.Size(640, 360);
             this.pictureBoxFrame.TabIndex = 4;
@@ -85,9 +85,9 @@
             // 
             // HPBarForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(971, 563);
+            this.ClientSize = new System.Drawing.Size(971, 520);
             this.Controls.Add(this.pictureBoxFrame);
             this.Controls.Add(this.AnalyzeB);
             this.Controls.Add(this.ConfigB);

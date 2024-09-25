@@ -26,9 +26,23 @@ namespace HealthBar {
             FileSelector fileS = new FileSelector();
             string selectedF = fileS.SelectVideoFile();
 
-            //動画を開く       
-            int frame = 1;
-            pictureBoxFrame.Image = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame);
+            //テキストボックスにファイルパスを表示
+            FileDisplay.Text = selectedF;
+
+            //動画ファイルを開く
+            if(!string.IsNullOrEmpty(selectedF) && videoL.LoadVideo(selectedF)) {
+
+                //最初のフレームを取得
+                Bitmap firstframe = videoL.GetFrameAt(0);
+                if(firstframe != null) {
+                    pictureBoxFrame.Image = firstframe;
+                } else {
+                    MessageBox.Show("フレーム取得失敗", "error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            } else {
+                MessageBox.Show("動画の読み込みに失敗しました", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
         }
 
         public void ConfigB_Click(object sender, EventArgs e) {
