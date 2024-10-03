@@ -73,13 +73,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analizer.cs" />
+    <Compile Include="Analysis.cs" />
     <Compile Include="FileSelector.cs" />
-    <Compile Include="HPBarConfigForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="HPBarConfigForm.Designer.cs">
-      <DependentUpon>HPBarConfigForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="HPBarForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -89,9 +84,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VideoLoader.cs" />
-    <EmbeddedResource Include="HPBarConfigForm.resx">
-      <DependentUpon>HPBarConfigForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="HPBarForm.resx">
       <DependentUpon>HPBarForm.cs</DependentUpon>
     </EmbeddedResource>

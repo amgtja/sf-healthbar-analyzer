@@ -30,18 +30,22 @@
         {
             this.FileSelectB = new System.Windows.Forms.Button();
             this.FileDisplay = new System.Windows.Forms.TextBox();
-            this.ConfigB = new System.Windows.Forms.Button();
             this.AnalyzeB = new System.Windows.Forms.Button();
             this.pictureBoxFrame = new System.Windows.Forms.PictureBox();
+            this.trackBarFrame = new System.Windows.Forms.TrackBar();
+            this.ConfigB = new System.Windows.Forms.Button();
+            this.BrightText = new System.Windows.Forms.TextBox();
+            this.pictureBoxHP = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).BeginInit();
             this.SuspendLayout();
             // 
             // FileSelectB
             // 
-            this.FileSelectB.Location = new System.Drawing.Point(385, 422);
-            this.FileSelectB.Margin = new System.Windows.Forms.Padding(2);
+            this.FileSelectB.Location = new System.Drawing.Point(578, 703);
             this.FileSelectB.Name = "FileSelectB";
-            this.FileSelectB.Size = new System.Drawing.Size(196, 108);
+            this.FileSelectB.Size = new System.Drawing.Size(294, 180);
             this.FileSelectB.TabIndex = 0;
             this.FileSelectB.Text = "ファイル選択ボタン";
             this.FileSelectB.UseVisualStyleBackColor = true;
@@ -49,55 +53,86 @@
             // 
             // FileDisplay
             // 
-            this.FileDisplay.Location = new System.Drawing.Point(231, 10);
-            this.FileDisplay.Margin = new System.Windows.Forms.Padding(2);
+            this.FileDisplay.Location = new System.Drawing.Point(346, 818);
             this.FileDisplay.Name = "FileDisplay";
-            this.FileDisplay.Size = new System.Drawing.Size(529, 19);
+            this.FileDisplay.Size = new System.Drawing.Size(792, 26);
             this.FileDisplay.TabIndex = 1;
+            this.FileDisplay.TextChanged += new System.EventHandler(this.FileDisplay_TextChanged);
+            // 
+            // AnalyzeB
+            // 
+            this.AnalyzeB.Location = new System.Drawing.Point(1068, 691);
+            this.AnalyzeB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.AnalyzeB.Name = "AnalyzeB";
+            this.AnalyzeB.Size = new System.Drawing.Size(273, 203);
+            this.AnalyzeB.TabIndex = 3;
+            this.AnalyzeB.Text = "解析ボタン";
+            this.AnalyzeB.UseVisualStyleBackColor = true;
+            this.AnalyzeB.Click += new System.EventHandler(this.AnalyzeB_Click);
+            // 
+            // pictureBoxFrame
+            // 
+            this.pictureBoxFrame.Location = new System.Drawing.Point(242, 2);
+            this.pictureBoxFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.pictureBoxFrame.Name = "pictureBoxFrame";
+            this.pictureBoxFrame.Size = new System.Drawing.Size(960, 600);
+            this.pictureBoxFrame.TabIndex = 4;
+            this.pictureBoxFrame.TabStop = false;
+            // 
+            // trackBarFrame
+            // 
+            this.trackBarFrame.Location = new System.Drawing.Point(242, 611);
+            this.trackBarFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.trackBarFrame.Name = "trackBarFrame";
+            this.trackBarFrame.Size = new System.Drawing.Size(960, 69);
+            this.trackBarFrame.TabIndex = 5;
+            this.trackBarFrame.Scroll += new System.EventHandler(this.trackBarFrame_Scroll);
             // 
             // ConfigB
             // 
-            this.ConfigB.Location = new System.Drawing.Point(84, 429);
-            this.ConfigB.Margin = new System.Windows.Forms.Padding(2);
+            this.ConfigB.Location = new System.Drawing.Point(126, 715);
             this.ConfigB.Name = "ConfigB";
-            this.ConfigB.Size = new System.Drawing.Size(143, 101);
+            this.ConfigB.Size = new System.Drawing.Size(214, 168);
             this.ConfigB.TabIndex = 2;
             this.ConfigB.Text = "設定";
             this.ConfigB.UseVisualStyleBackColor = true;
             this.ConfigB.Click += new System.EventHandler(this.ConfigB_Click);
             // 
-            // AnalyzeB
+            // BrightText
             // 
-            this.AnalyzeB.Location = new System.Drawing.Point(712, 414);
-            this.AnalyzeB.Name = "AnalyzeB";
-            this.AnalyzeB.Size = new System.Drawing.Size(182, 122);
-            this.AnalyzeB.TabIndex = 3;
-            this.AnalyzeB.Text = "解析ボタン";
-            this.AnalyzeB.UseVisualStyleBackColor = true;
+            this.BrightText.Location = new System.Drawing.Point(126, 683);
+            this.BrightText.Name = "BrightText";
+            this.BrightText.Size = new System.Drawing.Size(214, 26);
+            this.BrightText.TabIndex = 6;
+            this.BrightText.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
-            // pictureBoxFrame
+            // pictureBoxHP
             // 
-            this.pictureBoxFrame.Location = new System.Drawing.Point(171, 48);
-            this.pictureBoxFrame.Name = "pictureBoxFrame";
-            this.pictureBoxFrame.Size = new System.Drawing.Size(640, 360);
-            this.pictureBoxFrame.TabIndex = 4;
-            this.pictureBoxFrame.TabStop = false;
+            this.pictureBoxHP.Location = new System.Drawing.Point(1209, 162);
+            this.pictureBoxHP.Name = "pictureBoxHP";
+            this.pictureBoxHP.Size = new System.Drawing.Size(246, 440);
+            this.pictureBoxHP.TabIndex = 7;
+            this.pictureBoxHP.TabStop = false;
             // 
             // HPBarForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(971, 520);
+            this.ClientSize = new System.Drawing.Size(1456, 866);
+            this.Controls.Add(this.pictureBoxHP);
+            this.Controls.Add(this.BrightText);
+            this.Controls.Add(this.trackBarFrame);
             this.Controls.Add(this.pictureBoxFrame);
             this.Controls.Add(this.AnalyzeB);
             this.Controls.Add(this.ConfigB);
             this.Controls.Add(this.FileDisplay);
             this.Controls.Add(this.FileSelectB);
-            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "HPBarForm";
             this.Text = "体力ゲージ記録";
             this.Load += new System.EventHandler(this.HPBar_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -107,9 +142,12 @@
 
         private System.Windows.Forms.Button FileSelectB;
         private System.Windows.Forms.TextBox FileDisplay;
-        private System.Windows.Forms.Button ConfigB;
         private System.Windows.Forms.Button AnalyzeB;
         private System.Windows.Forms.PictureBox pictureBoxFrame;
+        private System.Windows.Forms.TrackBar trackBarFrame;
+        private System.Windows.Forms.Button ConfigB;
+        private System.Windows.Forms.TextBox BrightText;
+        private System.Windows.Forms.PictureBox pictureBoxHP;
     }
 }
 
