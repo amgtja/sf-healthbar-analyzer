@@ -23,6 +23,7 @@ namespace HealthBar {
         public Mat previousFrameMat;
         public int thValue = 30;
         public string selectedF = null;
+        public int selectedY = 0;
         public HPBarForm() {
             InitializeComponent();
             videoL = new VideoLoader();
@@ -69,25 +70,48 @@ namespace HealthBar {
         }
 
         public void ConfigB_Click(object sender, EventArgs e) {
-            //pictureBoxFrame.MouseClick += pictureBoxFrame_MouseClick;
+            pictureBoxFrame.MouseClick += pictureBoxFrame_MouseClick;
             //points.Clear();
 
         }
-
+        public List<byte> GetBright(int currentFrame, int y) {
+            List<byte> brightValue = new List<byte>();
+            int width = videoL.GetFrameAt(currentFrame).Width;
+            Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(videoL.GetFrameAt(currentFrame));
+            for (int x = 0; x < width; x++) {
+                byte brightness = frame.At<byte>(y, x);
+                brightValue.Add(brightness);
+            }
+            return brightValue;
+        }
 
         public void pictureBoxFrame_MouseClick(object sender, MouseEventArgs e) {
-            if (points.Count < 4) {
-                points.Add(e.Location);
-                if (points.Count == 4) {
-                    int xMin = Math.Min(Math.Min(points[0].X, points[1].X), Math.Min(points[2].X, points[3].X));
-                    int xMax = Math.Max(Math.Max(points[0].X, points[1].X), Math.Max(points[2].X, points[3].X));
-                    int yMin = Math.Min(Math.Min(points[0].Y, points[1].Y), Math.Min(points[2].Y, points[3].Y));
-                    int yMax = Math.Max(Math.Max(points[0].Y, points[1].Y), Math.Min(points[2].Y, points[3].Y));
-                    HPBarArea = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
-                    isSettingComplete = true;
-                    MessageBox.Show("体力ゲージ範囲設定完了");
-                }
+            //クリックされた座標を取得したい
+            selectedY = e.Y;
+            BrightText.Text = selectedY.ToString();
+            // クリックされたY座標の輝度値を全て取得
+            List<byte> brightnessValues = GetBright(trackBarFrame.Value,selectedY);
+
+            // 輝度値を表示（例えば、メッセージボックスに表示）
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Y座標: {e.Y} の輝度値:");
+            foreach (var brightness in brightnessValues) {
+                sb.Append($"{brightness} ");
             }
+            MessageBox.Show(sb.ToString(), "Brightness Values", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            //if (points.Count < 4) {
+            //    points.Add(e.Location);
+            //    if (points.Count == 4) {
+            //        int xMin = Math.Min(Math.Min(points[0].X, points[1].X), Math.Min(points[2].X, points[3].X));
+            //        int xMax = Math.Max(Math.Max(points[0].X, points[1].X), Math.Max(points[2].X, points[3].X));
+            //        int yMin = Math.Min(Math.Min(points[0].Y, points[1].Y), Math.Min(points[2].Y, points[3].Y));
+            //        int yMax = Math.Max(Math.Max(points[0].Y, points[1].Y), Math.Min(points[2].Y, points[3].Y));
+            //        HPBarArea = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
+            //        isSettingComplete = true;
+            //        MessageBox.Show("体力ゲージ範囲設定完了");
+            //    }
+            //}
         }
         public double CaliculateHPBar(Mat currentFrameMat) {
             if (!isSettingComplete || currentFrameMat == null) { return -1; }

@@ -60,5 +60,6 @@ namespace HealthBar {
             return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(bwMat);
 
         }
+
     }
 }

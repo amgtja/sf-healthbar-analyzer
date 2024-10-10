@@ -45,7 +45,7 @@
             // 
             // FileSelectB
             // 
-            this.FileSelectB.Location = new System.Drawing.Point(849, 854);
+            this.FileSelectB.Location = new System.Drawing.Point(1110, 843);
             this.FileSelectB.Name = "FileSelectB";
             this.FileSelectB.Size = new System.Drawing.Size(294, 180);
             this.FileSelectB.TabIndex = 0;
@@ -83,7 +83,7 @@
             // 
             // trackBarFrame
             // 
-            this.trackBarFrame.Location = new System.Drawing.Point(284, 777);
+            this.trackBarFrame.Location = new System.Drawing.Point(376, 610);
             this.trackBarFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.trackBarFrame.Name = "trackBarFrame";
             this.trackBarFrame.Size = new System.Drawing.Size(1439, 69);
@@ -92,7 +92,7 @@
             // 
             // ConfigB
             // 
-            this.ConfigB.Location = new System.Drawing.Point(284, 878);
+            this.ConfigB.Location = new System.Drawing.Point(859, 843);
             this.ConfigB.Name = "ConfigB";
             this.ConfigB.Size = new System.Drawing.Size(214, 168);
             this.ConfigB.TabIndex = 2;
@@ -102,7 +102,7 @@
             // 
             // BrightText
             // 
-            this.BrightText.Location = new System.Drawing.Point(284, 843);
+            this.BrightText.Location = new System.Drawing.Point(859, 798);
             this.BrightText.Name = "BrightText";
             this.BrightText.Size = new System.Drawing.Size(214, 26);
             this.BrightText.TabIndex = 6;
@@ -110,9 +110,9 @@
             // 
             // pictureBoxHP
             // 
-            this.pictureBoxHP.Location = new System.Drawing.Point(12, 606);
+            this.pictureBoxHP.Location = new System.Drawing.Point(-1, 664);
             this.pictureBoxHP.Name = "pictureBoxHP";
-            this.pictureBoxHP.Size = new System.Drawing.Size(246, 440);
+            this.pictureBoxHP.Size = new System.Drawing.Size(960, 347);
             this.pictureBoxHP.TabIndex = 7;
             this.pictureBoxHP.TabStop = false;
             // 
