@@ -40,6 +40,9 @@ namespace HealthBar {
         }
 
         public void FileSelectB_Click(object sender, EventArgs e) {
+            //selectedFにファイルパス入れる
+            //0フレーム目の取得、pictureBoxFrameにBitmap形式のframeを代入して表示させる
+
             //FileSelectorクラスのインスタンス作成、動画ファイル選択
             FileSelector fileS = new FileSelector();
             selectedF = fileS.SelectVideoFile();
@@ -66,8 +69,9 @@ namespace HealthBar {
         }
 
         public void ConfigB_Click(object sender, EventArgs e) {
-            pictureBoxFrame.MouseClick += pictureBoxFrame_MouseClick;
-            points.Clear();
+            //pictureBoxFrame.MouseClick += pictureBoxFrame_MouseClick;
+            //points.Clear();
+
         }
 
 
@@ -160,7 +164,7 @@ namespace HealthBar {
 
         public void trackBarFrame_Scroll(object sender, EventArgs e) {
             pictureBoxFrame.Image = videoL.GetFrameAt(trackBarFrame.Value);
-            DrawHealthBarGraph(trackBarFrame.Value);
+            pictureBoxBW.Image = videoL.ToBW(trackBarFrame.Value);
         }
 
         public void pictureBoxFrame_MouseDown(object sender, MouseEventArgs e) {
@@ -173,14 +177,15 @@ namespace HealthBar {
         }
 
         public void AnalyzeB_Click(object sender, EventArgs e) {
-            //SaveFileDialog saveFileDialog = new SaveFileDialog();
-            //saveFileDialog.Filter = "CSV Files (*.csv)|*.csv";
-            //saveFileDialog.Title = "体力ゲージデータを保存";
-            ////ファイル選択したとき
-            //if(saveFileDialog.ShowDialog() == DialogResult.OK) {
-            //    string filePath = saveFileDialog.FileName;
-            //    ExportHPDataCSV(filePath);
-            ExportHPDataToPicture();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "CSV Files (*.csv)|*.csv";
+            saveFileDialog.Title = "体力ゲージデータを保存";
+            //ファイル選択したとき
+            if (saveFileDialog.ShowDialog() == DialogResult.OK) {
+                string filePath = saveFileDialog.FileName;
+                ExportHPDataCSV(filePath);
+                //ExportHPDataToPicture();
+            }
         }
     }
 }

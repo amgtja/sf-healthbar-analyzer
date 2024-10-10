@@ -36,14 +36,16 @@
             this.ConfigB = new System.Windows.Forms.Button();
             this.BrightText = new System.Windows.Forms.TextBox();
             this.pictureBoxHP = new System.Windows.Forms.PictureBox();
+            this.pictureBoxBW = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBW)).BeginInit();
             this.SuspendLayout();
             // 
             // FileSelectB
             // 
-            this.FileSelectB.Location = new System.Drawing.Point(578, 703);
+            this.FileSelectB.Location = new System.Drawing.Point(849, 854);
             this.FileSelectB.Name = "FileSelectB";
             this.FileSelectB.Size = new System.Drawing.Size(294, 180);
             this.FileSelectB.TabIndex = 0;
@@ -53,7 +55,7 @@
             // 
             // FileDisplay
             // 
-            this.FileDisplay.Location = new System.Drawing.Point(346, 818);
+            this.FileDisplay.Location = new System.Drawing.Point(612, 1020);
             this.FileDisplay.Name = "FileDisplay";
             this.FileDisplay.Size = new System.Drawing.Size(792, 26);
             this.FileDisplay.TabIndex = 1;
@@ -61,7 +63,7 @@
             // 
             // AnalyzeB
             // 
-            this.AnalyzeB.Location = new System.Drawing.Point(1068, 691);
+            this.AnalyzeB.Location = new System.Drawing.Point(1450, 843);
             this.AnalyzeB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.AnalyzeB.Name = "AnalyzeB";
             this.AnalyzeB.Size = new System.Drawing.Size(273, 203);
@@ -72,7 +74,7 @@
             // 
             // pictureBoxFrame
             // 
-            this.pictureBoxFrame.Location = new System.Drawing.Point(242, 2);
+            this.pictureBoxFrame.Location = new System.Drawing.Point(-1, 2);
             this.pictureBoxFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pictureBoxFrame.Name = "pictureBoxFrame";
             this.pictureBoxFrame.Size = new System.Drawing.Size(960, 600);
@@ -81,16 +83,16 @@
             // 
             // trackBarFrame
             // 
-            this.trackBarFrame.Location = new System.Drawing.Point(242, 611);
+            this.trackBarFrame.Location = new System.Drawing.Point(284, 777);
             this.trackBarFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.trackBarFrame.Name = "trackBarFrame";
-            this.trackBarFrame.Size = new System.Drawing.Size(960, 69);
+            this.trackBarFrame.Size = new System.Drawing.Size(1439, 69);
             this.trackBarFrame.TabIndex = 5;
             this.trackBarFrame.Scroll += new System.EventHandler(this.trackBarFrame_Scroll);
             // 
             // ConfigB
             // 
-            this.ConfigB.Location = new System.Drawing.Point(126, 715);
+            this.ConfigB.Location = new System.Drawing.Point(284, 878);
             this.ConfigB.Name = "ConfigB";
             this.ConfigB.Size = new System.Drawing.Size(214, 168);
             this.ConfigB.TabIndex = 2;
@@ -100,7 +102,7 @@
             // 
             // BrightText
             // 
-            this.BrightText.Location = new System.Drawing.Point(126, 683);
+            this.BrightText.Location = new System.Drawing.Point(284, 843);
             this.BrightText.Name = "BrightText";
             this.BrightText.Size = new System.Drawing.Size(214, 26);
             this.BrightText.TabIndex = 6;
@@ -108,17 +110,26 @@
             // 
             // pictureBoxHP
             // 
-            this.pictureBoxHP.Location = new System.Drawing.Point(1209, 162);
+            this.pictureBoxHP.Location = new System.Drawing.Point(12, 606);
             this.pictureBoxHP.Name = "pictureBoxHP";
             this.pictureBoxHP.Size = new System.Drawing.Size(246, 440);
             this.pictureBoxHP.TabIndex = 7;
             this.pictureBoxHP.TabStop = false;
             // 
+            // pictureBoxBW
+            // 
+            this.pictureBoxBW.Location = new System.Drawing.Point(966, 2);
+            this.pictureBoxBW.Name = "pictureBoxBW";
+            this.pictureBoxBW.Size = new System.Drawing.Size(960, 600);
+            this.pictureBoxBW.TabIndex = 8;
+            this.pictureBoxBW.TabStop = false;
+            // 
             // HPBarForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1456, 866);
+            this.ClientSize = new System.Drawing.Size(1853, 1076);
+            this.Controls.Add(this.pictureBoxBW);
             this.Controls.Add(this.pictureBoxHP);
             this.Controls.Add(this.BrightText);
             this.Controls.Add(this.trackBarFrame);
@@ -133,6 +144,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBW)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -148,6 +160,7 @@
         private System.Windows.Forms.Button ConfigB;
         private System.Windows.Forms.TextBox BrightText;
         private System.Windows.Forms.PictureBox pictureBoxHP;
+        private System.Windows.Forms.PictureBox pictureBoxBW;
     }
 }
 
