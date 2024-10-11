@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using OpenCvSharp;
 
 namespace HealthBar {
@@ -16,8 +17,10 @@ namespace HealthBar {
 
         public List<System.Drawing.Point> points = new List<System.Drawing.Point>();
         public List<double> healthPercents = new List<double>();
+        public List<System.Drawing.Point> boundaryPoints = new List<System.Drawing.Point>();
         bool isSettingComplete = false;
         public VideoLoader videoL;
+        public Analizer analizer;
         public bool mouseDrug = false;
         public Rectangle HPBarArea;
         public Mat previousFrameMat;
@@ -27,16 +30,20 @@ namespace HealthBar {
         public HPBarForm() {
             InitializeComponent();
             videoL = new VideoLoader();
+            analizer = new Analizer();
 
             //ファイルパス表示or非表示
             FileDisplay.Visible = false;
+
+            //Paintイベント
+            pictureBoxFrame.Paint += pictureBoxFrame_Paint;
         }
 
         public void HPBar_Load(object sender, EventArgs e) {
             trackBarFrame.Minimum = 0;
             trackBarFrame.Scroll += trackBarFrame_Scroll;
             if (videoL.TotalFrames > 0) {
-                DrawHealthBarGraph(0);
+                //DrawHealthBarGraph(0);
             }
         }
 
@@ -71,7 +78,7 @@ namespace HealthBar {
 
         public void ConfigB_Click(object sender, EventArgs e) {
             pictureBoxFrame.MouseClick += pictureBoxFrame_MouseClick;
-            //points.Clear();
+            pictureBoxBW.MouseClick += pictureBoxBW_MouseClick;
 
         }
         public List<byte> GetBright(int currentFrame, int y) {
@@ -89,98 +96,196 @@ namespace HealthBar {
             //クリックされた座標を取得したい
             selectedY = e.Y;
             BrightText.Text = selectedY.ToString();
+            var rgbValues = GetRGB(trackBarFrame.Value, selectedY);
+            DrawChartRGB(rgbValues);
+            List<byte> brightnessValues = GetBright(trackBarFrame.Value, selectedY);
+            DrawChart(brightnessValues);
+            List<int> gradients = Gradient1(trackBarFrame.Value, selectedY);
+            DrawChartGradient(gradients);
+            List<int> boundaries = FindBoundary(gradients);
+            string boundariesString = string.Join(", ", boundaries);
+
+            //境界点を描写したい
+            boundaryPoints.Clear();
+            foreach (int x in boundaries) {
+                boundaryPoints.Add(new System.Drawing.Point(x, selectedY));
+            }
+            pictureBoxFrame.Invalidate();
+
+
+            MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        }
+        private void pictureBoxFrame_Paint(object sender, PaintEventArgs e) {
+            Graphics g = e.Graphics;
+            Brush brush = Brushes.Red; // 点の色を指定
+            int pointSize = 5; // 点のサイズ
+
+            // 境界のポイントを描画
+            foreach (System.Drawing.Point point in boundaryPoints) {
+                g.FillEllipse(brush, point.X - pointSize / 2, point.Y - pointSize / 2, pointSize, pointSize);
+            }
+        }
+
+        public void pictureBoxBW_MouseClick(object sender, MouseEventArgs e) {
+            selectedY = e.Y;
+
             // クリックされたY座標の輝度値を全て取得
-            List<byte> brightnessValues = GetBright(trackBarFrame.Value,selectedY);
-
+            List<byte> brightnessValues = GetBright(trackBarFrame.Value, selectedY);
+            DrawChart(brightnessValues);
             // 輝度値を表示（例えば、メッセージボックスに表示）
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"Y座標: {e.Y} の輝度値:");
-            foreach (var brightness in brightnessValues) {
-                sb.Append($"{brightness} ");
-            }
-            MessageBox.Show(sb.ToString(), "Brightness Values", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            //if (points.Count < 4) {
-            //    points.Add(e.Location);
-            //    if (points.Count == 4) {
-            //        int xMin = Math.Min(Math.Min(points[0].X, points[1].X), Math.Min(points[2].X, points[3].X));
-            //        int xMax = Math.Max(Math.Max(points[0].X, points[1].X), Math.Max(points[2].X, points[3].X));
-            //        int yMin = Math.Min(Math.Min(points[0].Y, points[1].Y), Math.Min(points[2].Y, points[3].Y));
-            //        int yMax = Math.Max(Math.Max(points[0].Y, points[1].Y), Math.Min(points[2].Y, points[3].Y));
-            //        HPBarArea = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
-            //        isSettingComplete = true;
-            //        MessageBox.Show("体力ゲージ範囲設定完了");
-            //    }
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendLine($"Y座標: {e.Y} の輝度値:");
+            //foreach (var brightness in brightnessValues) {
+            //    sb.Append($"{brightness} ");
             //}
+            //MessageBox.Show(sb.ToString(), "Brightness Values", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        public double CaliculateHPBar(Mat currentFrameMat) {
-            if (!isSettingComplete || currentFrameMat == null) { return -1; }
-            Mat currentRoi = new Mat(currentFrameMat, new OpenCvSharp.Rect(HPBarArea.X, HPBarArea.Y, HPBarArea.Width, HPBarArea.Height));
-            Mat graycurrentRoi = new Mat();
-            Cv2.CvtColor(currentRoi, graycurrentRoi, ColorConversionCodes.BGR2GRAY);
-
-            //前フレームのチェック
-            if (previousFrameMat == null) {
-                previousFrameMat = graycurrentRoi.Clone();
-                return 100.0;
+        public void DrawChart(List<byte> data) {
+            //初期化
+            chartDataGray.Series.Clear();
+            chartDataGray.ChartAreas.Clear();
+            //新しいエリアとシリーズの確保
+            ChartArea chartArea = new ChartArea("BrightnessArea");
+            chartDataGray.ChartAreas.Add(chartArea);
+            Series series = new Series("Brightness");
+            series.ChartType = SeriesChartType.Column;
+            chartDataGray.Series.Add(series);
+            //凡例なし
+            series.IsVisibleInLegend = false;
+            //輝度データ追加
+            for (int x = 0; x < data.Count; x++) {
+                series.Points.AddXY(x, data[x]);
             }
-            //差分計算
-            Mat diff = new Mat();
-            Cv2.Absdiff(previousFrameMat, graycurrentRoi, diff);
-            //差分のうち、一定以上のピクセル値を体力減少としてカウント(変数:thValue)
-            Mat mask = new Mat();
-            Cv2.Threshold(diff, mask, thValue, 255, ThresholdTypes.Binary);
-
-            //差分のピクセル数をカウント
-            int changingPixels = Cv2.CountNonZero(mask);
-            int totalPixels = HPBarArea.Width * HPBarArea.Height;
-
-            //現在の体力を返す
-            double healthPercent = 100 * (1.0 - (double)changingPixels / totalPixels);
-            healthPercents.Add(healthPercent);
-
-            return healthPercent;
+            chartDataGray.ChartAreas["BrightnessArea"].AxisX.Title = "X座標";
+            chartDataGray.ChartAreas["BrightnessArea"].RecalculateAxesScale();
         }
-        public void DrawHealthBarGraph(int currentFrameIndex) {
-            if (healthPercents.Count == 0 || currentFrameIndex >= healthPercents.Count) return;
-            Bitmap graphBitmap = new Bitmap(pictureBoxHP.Width, pictureBoxHP.Height);
-            using (Graphics g = Graphics.FromImage(graphBitmap)) {
-                g.Clear(Color.White);
-                int barWidth = pictureBoxHP.Width / healthPercents.Count;
-                int maxHeight = pictureBoxHP.Height;
+        public void DrawChartGradient(List<int> data) {
+            //初期化
+            chartG.Series.Clear();
+            chartG.ChartAreas.Clear();
+            //新しいエリアとシリーズの確保
+            ChartArea chartArea = new ChartArea("GradientsArea");
+            chartG.ChartAreas.Add(chartArea);
+            Series series = new Series("Gradients");
+            series.ChartType = SeriesChartType.Column;
+            chartG.Series.Add(series);
+            //凡例なし
+            series.IsVisibleInLegend = false;
+            //輝度データ追加
+            for (int x = 0; x < data.Count; x++) {
+                series.Points.AddXY(x, data[x]);
+            }
+            chartG.ChartAreas["GradientsArea"].AxisX.Title = "X座標";
+            chartG.ChartAreas["GradientsArea"].RecalculateAxesScale();
+        }
+        public void DrawChartRGB((List<byte> R, List<byte> G, List<byte> B) rgbValues) {
+            chartData.Series.Clear();
+            chartData.ChartAreas.Clear();
+            ChartArea chartArea = new ChartArea("RGBArea");
+            chartData.ChartAreas.Add(chartArea);
+            Series seriesR = new Series("Red") {
+                ChartType = SeriesChartType.Line,
+                Color = Color.Red
+            };
+            Series seriesG = new Series("Green") {
+                ChartType = SeriesChartType.Line,
+                Color = Color.Green
+            };
+            Series seriesB = new Series("Blue") {
+                ChartType = SeriesChartType.Line,
+                Color = Color.Blue
+            };
+            chartData.Series.Add(seriesR);
+            chartData.Series.Add(seriesG);
+            chartData.Series.Add(seriesB);
+            //凡例なし
+            seriesR.IsVisibleInLegend = false;
+            seriesG.IsVisibleInLegend = false;
+            seriesB.IsVisibleInLegend = false;
 
-                for (int i = 0; i < healthPercents.Count; i++) {
-                    double percent = healthPercents[i];
-                    int barHeight = (int)(maxHeight * (percent / 100));
-                    //ハイライト
-                    Brush brush = i == currentFrameIndex ? Brushes.Red : Brushes.Blue;
-                    g.FillRectangle(brush, i * barWidth, maxHeight - barHeight, barWidth - 2, barHeight);
+            for (int x = 0; x < rgbValues.R.Count; x++) {
+                seriesR.Points.AddXY(x, rgbValues.R[x]);
+                seriesG.Points.AddXY(x, rgbValues.G[x]);
+                seriesB.Points.AddXY(x, rgbValues.B[x]);
+            }
+            chartData.ChartAreas["RGBArea"].AxisX.Title = "X座標";
+            chartData.ChartAreas["RGBArea"].RecalculateAxesScale();
+
+        }
+        public (List<byte> R, List<byte> G, List<byte> B) GetRGB(int currentFrame, int y) {
+            List<byte> rValues = new List<byte>();
+            List<byte> gValues = new List<byte>();
+            List<byte> bValues = new List<byte>();
+
+            Bitmap frameBitmap = videoL.GetFrameAt(currentFrame);
+            Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(frameBitmap);
+
+            for (int x = 0; x < frame.Width; x++) {
+                Vec3b color = frame.At<Vec3b>(y, x); // OpenCVのVec3b型でRGB値を取得
+                bValues.Add(color.Item0); // B成分
+                gValues.Add(color.Item1); // G成分
+                rValues.Add(color.Item2); // R成分
+            }
+
+            return (rValues, gValues, bValues);
+        }
+
+        public List<int> Gradient1(int currentFrame, int y) {
+            List<int> gradients = new List<int>();
+
+            Bitmap frameBitmap = videoL.GetFrameAt(currentFrame);
+            Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(frameBitmap);
+
+            // RGB値の総和を計算し、輝度の代わり
+            List<int> intensityValues = new List<int>();
+
+            for (int x = 0; x < frame.Width; x++) {
+                Vec3b color = frame.At<Vec3b>(y, x);
+                int intensity = color.Item0 + color.Item1 + color.Item2; // R + G + Bの総和を計算
+                intensityValues.Add(intensity);
+            }
+
+            // 勾配（一次微分）の計算
+            for (int i = 1; i < intensityValues.Count; i++) {
+                int gradient = Math.Abs(intensityValues[i] - intensityValues[i - 1]);
+                gradients.Add(gradient);
+            }
+
+            return gradients;
+
+        }
+        public List<int> FindBoundary(List<int> gradient) {
+            List<int> boundaries = new List<int>();
+            int temp = 0;
+            bool mode = true;
+            for (int i = 0; i < gradient.Count; i++) {
+                if (mode == true) {
+                    if (gradient[i] > 100) {
+                        temp = 0;
+                    } else {
+                        temp++;
+                    }
+                    if (temp > 100) {
+                        boundaries.Add(gradient[i]);
+                        mode = false;
+                        temp = 0;
+                    }
+                }
+                if (mode == false) {
+                    if (gradient[i] > 100) {
+                        boundaries.Add(gradient[i]);
+                        mode = true;
+                    }
                 }
             }
-            pictureBoxHP.Image = graphBitmap;
-        }
-        public void ExportHPDataToPicture() {
-            if (!isSettingComplete) { return; }
-            for (int i = 0; i <= trackBarFrame.Maximum; i++) {
-                Bitmap frame = videoL.GetFrameAt(i);
-                Mat frameMat = OpenCvSharp.Extensions.BitmapConverter.ToMat(frame);
-                double healthPercentage = CaliculateHPBar(frameMat);
-            }
+            return boundaries;
         }
 
-        public void ExportHPDataCSV(string filePath) {
-            if (!isSettingComplete) { return; }
-            using (StreamWriter writer = new StreamWriter(filePath)) {
-                writer.WriteLine("Frame,HealthPercentage");
-                for (int i = 0; i <= trackBarFrame.Maximum; i++) {
-                    Bitmap frame = videoL.GetFrameAt(i);
-                    Mat frameMat = OpenCvSharp.Extensions.BitmapConverter.ToMat(frame);
-                    double healthPercentage = CaliculateHPBar(frameMat);
-                    writer.WriteLine($"{i},{healthPercentage}");
-                }
-            }
-            MessageBox.Show("CSV出力完了");
-        }
+
+
+
+
 
         private void FileDisplay_TextChanged(object sender, EventArgs e) {
 
@@ -198,18 +303,6 @@ namespace HealthBar {
 
         private void textBox1_TextChanged(object sender, EventArgs e) {
 
-        }
-
-        public void AnalyzeB_Click(object sender, EventArgs e) {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "CSV Files (*.csv)|*.csv";
-            saveFileDialog.Title = "体力ゲージデータを保存";
-            //ファイル選択したとき
-            if (saveFileDialog.ShowDialog() == DialogResult.OK) {
-                string filePath = saveFileDialog.FileName;
-                ExportHPDataCSV(filePath);
-                //ExportHPDataToPicture();
-            }
         }
     }
 }

@@ -11,7 +11,5 @@ using OpenCvSharp;
 namespace HealthBar {
     public class Analizer {
         public VideoLoader videoL;
-        
-
     }
 }

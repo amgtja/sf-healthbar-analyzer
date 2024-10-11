@@ -28,6 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.FileSelectB = new System.Windows.Forms.Button();
             this.FileDisplay = new System.Windows.Forms.TextBox();
             this.AnalyzeB = new System.Windows.Forms.Button();
@@ -35,19 +44,25 @@
             this.trackBarFrame = new System.Windows.Forms.TrackBar();
             this.ConfigB = new System.Windows.Forms.Button();
             this.BrightText = new System.Windows.Forms.TextBox();
-            this.pictureBoxHP = new System.Windows.Forms.PictureBox();
             this.pictureBoxBW = new System.Windows.Forms.PictureBox();
+            this.chartData = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartDataGray = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.pictureBoxHP = new System.Windows.Forms.PictureBox();
+            this.chartG = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBW)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartData)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartDataGray)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartG)).BeginInit();
             this.SuspendLayout();
             // 
             // FileSelectB
             // 
-            this.FileSelectB.Location = new System.Drawing.Point(1110, 843);
+            this.FileSelectB.Location = new System.Drawing.Point(1348, 825);
             this.FileSelectB.Name = "FileSelectB";
-            this.FileSelectB.Size = new System.Drawing.Size(294, 180);
+            this.FileSelectB.Size = new System.Drawing.Size(294, 203);
             this.FileSelectB.TabIndex = 0;
             this.FileSelectB.Text = "ファイル選択ボタン";
             this.FileSelectB.UseVisualStyleBackColor = true;
@@ -55,7 +70,7 @@
             // 
             // FileDisplay
             // 
-            this.FileDisplay.Location = new System.Drawing.Point(612, 1020);
+            this.FileDisplay.Location = new System.Drawing.Point(1130, 1036);
             this.FileDisplay.Name = "FileDisplay";
             this.FileDisplay.Size = new System.Drawing.Size(792, 26);
             this.FileDisplay.TabIndex = 1;
@@ -63,7 +78,7 @@
             // 
             // AnalyzeB
             // 
-            this.AnalyzeB.Location = new System.Drawing.Point(1450, 843);
+            this.AnalyzeB.Location = new System.Drawing.Point(1649, 825);
             this.AnalyzeB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.AnalyzeB.Name = "AnalyzeB";
             this.AnalyzeB.Size = new System.Drawing.Size(273, 203);
@@ -83,18 +98,18 @@
             // 
             // trackBarFrame
             // 
-            this.trackBarFrame.Location = new System.Drawing.Point(376, 610);
+            this.trackBarFrame.Location = new System.Drawing.Point(966, 721);
             this.trackBarFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.trackBarFrame.Name = "trackBarFrame";
-            this.trackBarFrame.Size = new System.Drawing.Size(1439, 69);
+            this.trackBarFrame.Size = new System.Drawing.Size(960, 69);
             this.trackBarFrame.TabIndex = 5;
             this.trackBarFrame.Scroll += new System.EventHandler(this.trackBarFrame_Scroll);
             // 
             // ConfigB
             // 
-            this.ConfigB.Location = new System.Drawing.Point(859, 843);
+            this.ConfigB.Location = new System.Drawing.Point(1128, 825);
             this.ConfigB.Name = "ConfigB";
-            this.ConfigB.Size = new System.Drawing.Size(214, 168);
+            this.ConfigB.Size = new System.Drawing.Size(214, 203);
             this.ConfigB.TabIndex = 2;
             this.ConfigB.Text = "設定";
             this.ConfigB.UseVisualStyleBackColor = true;
@@ -102,19 +117,11 @@
             // 
             // BrightText
             // 
-            this.BrightText.Location = new System.Drawing.Point(859, 798);
+            this.BrightText.Location = new System.Drawing.Point(1130, 793);
             this.BrightText.Name = "BrightText";
-            this.BrightText.Size = new System.Drawing.Size(214, 26);
+            this.BrightText.Size = new System.Drawing.Size(792, 26);
             this.BrightText.TabIndex = 6;
             this.BrightText.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
-            // 
-            // pictureBoxHP
-            // 
-            this.pictureBoxHP.Location = new System.Drawing.Point(-1, 664);
-            this.pictureBoxHP.Name = "pictureBoxHP";
-            this.pictureBoxHP.Size = new System.Drawing.Size(960, 347);
-            this.pictureBoxHP.TabIndex = 7;
-            this.pictureBoxHP.TabStop = false;
             // 
             // pictureBoxBW
             // 
@@ -124,11 +131,70 @@
             this.pictureBoxBW.TabIndex = 8;
             this.pictureBoxBW.TabStop = false;
             // 
+            // chartData
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chartData.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chartData.Legends.Add(legend1);
+            this.chartData.Location = new System.Drawing.Point(0, 245);
+            this.chartData.Name = "chartData";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chartData.Series.Add(series1);
+            this.chartData.Size = new System.Drawing.Size(960, 357);
+            this.chartData.TabIndex = 9;
+            this.chartData.Text = "chart1";
+            // 
+            // chartDataGray
+            // 
+            chartArea2.Name = "ChartArea1";
+            this.chartDataGray.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chartDataGray.Legends.Add(legend2);
+            this.chartDataGray.Location = new System.Drawing.Point(966, 400);
+            this.chartDataGray.Name = "chartDataGray";
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chartDataGray.Series.Add(series2);
+            this.chartDataGray.Size = new System.Drawing.Size(960, 300);
+            this.chartDataGray.TabIndex = 10;
+            this.chartDataGray.Text = "chart1";
+            // 
+            // pictureBoxHP
+            // 
+            this.pictureBoxHP.Location = new System.Drawing.Point(-1, 664);
+            this.pictureBoxHP.Name = "pictureBoxHP";
+            this.pictureBoxHP.Size = new System.Drawing.Size(0, 0);
+            this.pictureBoxHP.TabIndex = 7;
+            this.pictureBoxHP.TabStop = false;
+            // 
+            // chartG
+            // 
+            chartArea3.Name = "ChartArea1";
+            this.chartG.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.chartG.Legends.Add(legend3);
+            this.chartG.Location = new System.Drawing.Point(-1, 608);
+            this.chartG.Name = "chartG";
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.chartG.Series.Add(series3);
+            this.chartG.Size = new System.Drawing.Size(960, 454);
+            this.chartG.TabIndex = 11;
+            this.chartG.Text = "chart1";
+            // 
             // HPBarForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1853, 1076);
+            this.ClientSize = new System.Drawing.Size(1935, 1076);
+            this.Controls.Add(this.chartG);
+            this.Controls.Add(this.chartDataGray);
+            this.Controls.Add(this.chartData);
             this.Controls.Add(this.pictureBoxBW);
             this.Controls.Add(this.pictureBoxHP);
             this.Controls.Add(this.BrightText);
@@ -143,8 +209,11 @@
             this.Load += new System.EventHandler(this.HPBar_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBW)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartData)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartDataGray)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartG)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -159,8 +228,11 @@
         private System.Windows.Forms.TrackBar trackBarFrame;
         private System.Windows.Forms.Button ConfigB;
         private System.Windows.Forms.TextBox BrightText;
-        private System.Windows.Forms.PictureBox pictureBoxHP;
         private System.Windows.Forms.PictureBox pictureBoxBW;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartData;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartDataGray;
+        private System.Windows.Forms.PictureBox pictureBoxHP;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartG;
     }
 }
 
