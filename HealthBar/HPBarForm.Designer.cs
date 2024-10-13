@@ -85,7 +85,6 @@
             this.AnalyzeB.TabIndex = 3;
             this.AnalyzeB.Text = "解析ボタン";
             this.AnalyzeB.UseVisualStyleBackColor = true;
-            this.AnalyzeB.Click += new System.EventHandler(this.AnalyzeB_Click);
             // 
             // pictureBoxFrame
             // 

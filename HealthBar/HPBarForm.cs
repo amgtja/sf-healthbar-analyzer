@@ -93,15 +93,23 @@ namespace HealthBar {
         }
 
         public void pictureBoxFrame_MouseClick(object sender, MouseEventArgs e) {
-            //クリックされた座標を取得したい
+            //クリックされたY座標の取得
             selectedY = e.Y;
             BrightText.Text = selectedY.ToString();
+
+            //RGB値を出してみる
             var rgbValues = GetRGB(trackBarFrame.Value, selectedY);
             DrawChartRGB(rgbValues);
+
+            //輝度を出してみる
             List<byte> brightnessValues = GetBright(trackBarFrame.Value, selectedY);
             DrawChart(brightnessValues);
+
+            //隣のピクセルとの差分を見てみる
             List<int> gradients = Gradient1(trackBarFrame.Value, selectedY);
             DrawChartGradient(gradients);
+
+            //境界線を探す
             List<int> boundaries = FindBoundary(gradients);
             string boundariesString = string.Join(", ", boundaries);
 
@@ -111,8 +119,6 @@ namespace HealthBar {
                 boundaryPoints.Add(new System.Drawing.Point(x, selectedY));
             }
             pictureBoxFrame.Invalidate();
-
-
             MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
@@ -255,35 +261,39 @@ namespace HealthBar {
             return gradients;
 
         }
+
         public List<int> FindBoundary(List<int> gradient) {
             List<int> boundaries = new List<int>();
             int temp = 0;
-            bool mode = true;
-            for (int i = 0; i < gradient.Count; i++) {
-                if (mode == true) {
-                    if (gradient[i] > 100) {
-                        temp = 0;
-                    } else {
+            bool mode = true; // 境界内を見つけるモード
+            int threshold = 100; // 閾値を大きめに設定
+            int continuousPixels = 40; // 連続する「ほぼ0」領域の最小長さ
+
+            for (int i = 1; i < gradient.Count; i++) {
+                int diff = Math.Abs(gradient[i] - gradient[i - 1]);
+
+                if (mode) {
+                    if (diff < threshold) {
                         temp++;
+                    } else {
+                        temp = 0;
                     }
-                    if (temp > 100) {
-                        boundaries.Add(gradient[i]);
+
+                    if (temp >= continuousPixels) {
+                        boundaries.Add(i - continuousPixels);
                         mode = false;
                         temp = 0;
                     }
-                }
-                if (mode == false) {
-                    if (gradient[i] > 100) {
-                        boundaries.Add(gradient[i]);
+                } else {
+                    if (diff > threshold) {
+                        boundaries.Add(i);
                         mode = true;
                     }
                 }
             }
+
             return boundaries;
         }
-
-
-
 
 
 
