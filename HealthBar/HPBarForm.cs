@@ -119,7 +119,7 @@ namespace HealthBar {
                 boundaryPoints.Add(new System.Drawing.Point(x, selectedY));
             }
             pictureBoxFrame.Invalidate();
-            MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
         private void pictureBoxFrame_Paint(object sender, PaintEventArgs e) {
@@ -267,11 +267,11 @@ namespace HealthBar {
             int temp = 0;
             bool mode = true; // 境界内を見つけるモード
             int threshold = 100; // 閾値を大きめに設定
-            int continuousPixels = 40; // 連続する「ほぼ0」領域の最小長さ
-
+            int continuousPixels = 60; // 連続する「ほぼ0」領域の最小長さ
+            int count = 0;
             for (int i = 1; i < gradient.Count; i++) {
+                if (count == 4) { break; }
                 int diff = Math.Abs(gradient[i] - gradient[i - 1]);
-
                 if (mode) {
                     if (diff < threshold) {
                         temp++;
@@ -283,11 +283,13 @@ namespace HealthBar {
                         boundaries.Add(i - continuousPixels);
                         mode = false;
                         temp = 0;
+                        count++;
                     }
                 } else {
                     if (diff > threshold) {
                         boundaries.Add(i);
                         mode = true;
+                        count++;
                     }
                 }
             }
