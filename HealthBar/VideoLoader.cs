@@ -53,9 +53,7 @@ namespace HealthBar {
             Mat bwMat = new Mat();
             Cv2.Threshold(grayMat, bwMat, thresh, 255, ThresholdTypes.Binary);
             return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(bwMat);
-            OpenCvSharp.Point[][] contours;
-            OpenCvSharp.HierarchyIndex[] hindex;
-            Cv2.FindContours(bwMat, out contours, out hindex,RetrievalModes.List,ContourApproximationModes.ApproxNone);
+            Cv2.FindContours(bwMat, out OpenCvSharp.Point[][] contours, out HierarchyIndex[] hindex, RetrievalModes.List, ContourApproximationModes.ApproxNone);
             Cv2.DrawContours(bwMat, contours, -1, new Scalar(255, 0, 0), 2);
             return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(bwMat);
 

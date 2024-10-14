@@ -18,7 +18,8 @@ namespace HealthBar {
         public List<System.Drawing.Point> points = new List<System.Drawing.Point>();
         public List<double> healthPercents = new List<double>();
         public List<System.Drawing.Point> boundaryPoints = new List<System.Drawing.Point>();
-        bool isSettingComplete = false;
+        public List<int> boundaries = new List<int>();
+        public List<int> gradients = new List<int>();
         public VideoLoader videoL;
         public Analizer analizer;
         public bool mouseDrug = false;
@@ -36,15 +37,12 @@ namespace HealthBar {
             FileDisplay.Visible = false;
 
             //Paintイベント
-            pictureBoxFrame.Paint += pictureBoxFrame_Paint;
+            pictureBoxFrame.Paint += PictureBoxFrame_Paint;
         }
 
         public void HPBar_Load(object sender, EventArgs e) {
             trackBarFrame.Minimum = 0;
-            trackBarFrame.Scroll += trackBarFrame_Scroll;
-            if (videoL.TotalFrames > 0) {
-                //DrawHealthBarGraph(0);
-            }
+            trackBarFrame.Scroll += TrackBarFrame_Scroll;
         }
 
         public void FileSelectB_Click(object sender, EventArgs e) {
@@ -77,8 +75,8 @@ namespace HealthBar {
         }
 
         public void ConfigB_Click(object sender, EventArgs e) {
-            pictureBoxFrame.MouseClick += pictureBoxFrame_MouseClick;
-            pictureBoxBW.MouseClick += pictureBoxBW_MouseClick;
+            pictureBoxFrame.MouseClick += PictureBoxFrame_MouseClick;
+            pictureBoxBW.MouseClick += PictureBoxBW_MouseClick;
 
         }
         public List<byte> GetBright(int currentFrame, int y) {
@@ -92,7 +90,7 @@ namespace HealthBar {
             return brightValue;
         }
 
-        public void pictureBoxFrame_MouseClick(object sender, MouseEventArgs e) {
+        public void PictureBoxFrame_MouseClick(object sender, MouseEventArgs e) {
             //クリックされたY座標の取得
             selectedY = e.Y;
             BrightText.Text = selectedY.ToString();
@@ -122,7 +120,7 @@ namespace HealthBar {
             //MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
-        private void pictureBoxFrame_Paint(object sender, PaintEventArgs e) {
+        private void PictureBoxFrame_Paint(object sender, PaintEventArgs e) {
             Graphics g = e.Graphics;
             Brush brush = Brushes.Red; // 点の色を指定
             int pointSize = 5; // 点のサイズ
@@ -133,19 +131,13 @@ namespace HealthBar {
             }
         }
 
-        public void pictureBoxBW_MouseClick(object sender, MouseEventArgs e) {
+        public void PictureBoxBW_MouseClick(object sender, MouseEventArgs e) {
             selectedY = e.Y;
 
             // クリックされたY座標の輝度値を全て取得
             List<byte> brightnessValues = GetBright(trackBarFrame.Value, selectedY);
             DrawChart(brightnessValues);
-            // 輝度値を表示（例えば、メッセージボックスに表示）
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendLine($"Y座標: {e.Y} の輝度値:");
-            //foreach (var brightness in brightnessValues) {
-            //    sb.Append($"{brightness} ");
-            //}
-            //MessageBox.Show(sb.ToString(), "Brightness Values", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
         }
         public void DrawChart(List<byte> data) {
             //初期化
@@ -154,8 +146,9 @@ namespace HealthBar {
             //新しいエリアとシリーズの確保
             ChartArea chartArea = new ChartArea("BrightnessArea");
             chartDataGray.ChartAreas.Add(chartArea);
-            Series series = new Series("Brightness");
-            series.ChartType = SeriesChartType.Column;
+            Series series = new Series("Brightness") {
+                ChartType = SeriesChartType.Column
+            };
             chartDataGray.Series.Add(series);
             //凡例なし
             series.IsVisibleInLegend = false;
@@ -173,8 +166,9 @@ namespace HealthBar {
             //新しいエリアとシリーズの確保
             ChartArea chartArea = new ChartArea("GradientsArea");
             chartG.ChartAreas.Add(chartArea);
-            Series series = new Series("Gradients");
-            series.ChartType = SeriesChartType.Column;
+            Series series = new Series("Gradients") {
+                ChartType = SeriesChartType.Column
+            };
             chartG.Series.Add(series);
             //凡例なし
             series.IsVisibleInLegend = false;
@@ -258,10 +252,12 @@ namespace HealthBar {
                 gradients.Add(gradient);
             }
 
+            //gradient[X座標]で0に1のX座標が入っている、RGBの総和を出す
             return gradients;
 
         }
 
+        //境界点を見つけるメソッド
         public List<int> FindBoundary(List<int> gradient) {
             List<int> boundaries = new List<int>();
             int temp = 0;
@@ -297,24 +293,48 @@ namespace HealthBar {
             return boundaries;
         }
 
+        public int AnalizeBoundary(List<int> boundaries, List<int> gradient) {
+            int totalFrame = videoL.capture.FrameCount;
+            int threshold = 100;
+            int boundaryMax1P = boundaries[0];
+            int boundaryMin1P = boundaries[1];
+            int boundaryTemp1P = boundaryMax1P;
+            int maxHP = boundaryMax1P;
+            for (int j = (boundaryMin1P - 1); boundaryMax1P <= j; j--) {
+                if (gradient[j] > threshold) {
+                    boundaryTemp1P = j;
+                    break;
+                }
+                //そのフレームにおける体力の境界が出る
+                maxHP = boundaryTemp1P;
+            }
+            return maxHP;
+        }
 
 
         private void FileDisplay_TextChanged(object sender, EventArgs e) {
 
         }
 
-        public void trackBarFrame_Scroll(object sender, EventArgs e) {
+        public void TrackBarFrame_Scroll(object sender, EventArgs e) {
             pictureBoxFrame.Image = videoL.GetFrameAt(trackBarFrame.Value);
             pictureBoxBW.Image = videoL.ToBW(trackBarFrame.Value);
         }
 
-        public void pictureBoxFrame_MouseDown(object sender, MouseEventArgs e) {
+        public void PictureBoxFrame_MouseDown(object sender, MouseEventArgs e) {
             mouseDrug = true;
 
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e) {
+        private void TextBox1_TextChanged(object sender, EventArgs e) {
 
+        }
+
+        private void AnalyzeB_Click(object sender, EventArgs e) {
+            //int max = AnalizeBoundary(boundaries,gradients);
+            //MessageBox.Show(max.ToString());
+            string boundariesString = string.Join(", ", boundaries);
+            MessageBox.Show(boundariesString);
         }
     }
 }

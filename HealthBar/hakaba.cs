@@ -91,3 +91,10 @@
 //}
 //    }
 //}
+// 輝度値を表示（例えば、メッセージボックスに表示）
+//StringBuilder sb = new StringBuilder();
+//sb.AppendLine($"Y座標: {e.Y} の輝度値:");
+//foreach (var brightness in brightnessValues) {
+//    sb.Append($"{brightness} ");
+//}
+//MessageBox.Show(sb.ToString(), "Brightness Values", MessageBoxButtons.OK, MessageBoxIcon.Information);
