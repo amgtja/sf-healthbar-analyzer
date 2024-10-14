@@ -9,7 +9,7 @@ using OpenCvSharp;
 namespace HealthBar {
     public class VideoLoader {
         public VideoCapture capture;
-        public int TotalFrames { get; private set; }
+        public int TotalFrames { get; set; }
         public int thresh=130;
 
         //動画ファイルを読み込むメソッド
