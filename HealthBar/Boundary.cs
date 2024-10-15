@@ -88,35 +88,25 @@ namespace HealthBar {
         //    }return tempBoundary;
         //}
         public int AnalyzeBoundary(List<int> gradient, int currentFrame, int y) {
-            bool breakpoint = false;
-            //
-            var (rValues, gValues, bValues) = form.caliculate.GetRGB(currentFrame, y);
-            //暗転時のリセット
+            // 暗転時のリセット処理：gradient の全ての値が100以下の場合はリセット
             if (gradient.All(value => value <= 100)) {
                 tempBoundary = maxHPBoundary;
                 Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary}.");
                 return tempBoundary;
             }
 
-            //G成分のチェック
-            if (gValues[tempBoundary] > threshold && rValues[tempBoundary] > threshold) {
-                for (int x = minHPBoundary -1; x < tempBoundary; x--) {
-                    //境界設定
-                    if (gradient[x] > threshold ) {
-                        tempBoundary = x;
-                        breakpoint = true;
-                        break;
-                    }
-                    if (breakpoint) {
-                        breakpoint = false;
-                        break; }
-                }
-                if (!breakpoint) {
-                    return minHPBoundary;
-                } else {
+            // minHPBoundary から maxHPBoundary の方向へスライドして gradient を確認
+            for (int x = minHPBoundary-5; x >= maxHPBoundary; x--) {
+                // gradient が閾値を超えた場合にその位置を境界として設定
+                if (gradient[x] > threshold) {
+                    tempBoundary = x;
+                    Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary} with gradient {gradient[x]}.");
+                    return tempBoundary;
                 }
             }
-            return tempBoundary;
+
+            // 何も検出されなかった場合は、最小の境界を返す
+            return minHPBoundary;
         }
         public void SetBaseBoundaries(List<int> boundaries) {
             if (boundaries.Count >= 2) {
@@ -129,9 +119,10 @@ namespace HealthBar {
             }
         }
         public async Task CaliculateAllFrameHP(IProgress<int> progress) {
+            int currentBoundary = maxHPBoundary;
             int baseHPWidth = minHPBoundary - maxHPBoundary;
-            int currentHPWidth = minHPBoundary-maxHPBoundary;
-            double hpPercentage = (double)currentHPWidth / baseHPWidth * 100;
+            int currentHPWidth = baseHPWidth;
+            double hpPercentage = 100.0;
             if (maxHPBoundary == 0 && minHPBoundary == 0) {
                 MessageBox.Show("基準フレームが設定されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -140,25 +131,30 @@ namespace HealthBar {
             await Task.Run(() => {
                 //100%とする体力ゲージの設定
                 form.healthPercents.Clear();
+                //iはフレーム番号
                 for (int i = 0; i < videoL.TotalFrames; i++) {
                     //今のBoundaryをcurrentBoundaryとして表示
-                    int currentBoundary = AnalyzeBoundary(form.caliculate.Gradient1(i, form.selectedY), i, form.selectedY);
+                    //フレーム番号iにおける画像のGradientを出し、それで計算を行う
+                    currentBoundary = AnalyzeBoundary(form.caliculate.Gradient1(i, form.selectedY), i, form.selectedY);
+
+                    //現在の体力割合
                     currentHPWidth = minHPBoundary - currentBoundary;
 
                     // 体力割合を計算
                     hpPercentage = (double)currentHPWidth / baseHPWidth * 100;
+                    hpPercentage = Math.Max(0, Math.Min(100, hpPercentage));
                     lock (form.healthPercents) {
                         form.healthPercents.Add(hpPercentage);
                     }
                     //進捗報告
-                    progress.Report(i * 100 / videoL.TotalFrames);
+                    progress.Report((i + 1) * 100 / videoL.TotalFrames);
                 }
             });
             MessageBox.Show("全フレームの体力割合の計算が完了しました。", "計算完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         public void SaveHPPercentagesToCSV(string outputPath) {
             using (StreamWriter sw = new StreamWriter(outputPath)) {
-                sw.WriteLine("Frame,HPPercentage");
+                sw.WriteLine("Frame,HP1P");
                 for (int i = 0; i < form.healthPercents.Count; i++) {
                     sw.WriteLine($"{i},{form.healthPercents[i]}");
                 }
