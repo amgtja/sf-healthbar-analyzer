@@ -15,22 +15,15 @@ namespace HealthBar {
         public int minHPBoundary = 0;
         public int threshold = 100;
         public int tempBoundary = 0;
-        VideoLoader videoL;
         public Boundary(HPBarForm form) {
             this.form = form;
-            this.videoL = new VideoLoader();
-        }
-        public void LoadVideo(string filePath) {
-            if (!videoL.LoadVideo(filePath)) {
-                throw new Exception("ロード失敗");
-            }
         }
         public List<int> FindBoundary(List<int> gradient) {
             List<int> boundaries = new List<int>();
             int temp = 0;
             bool mode = true; // 境界内を見つけるモード
             int threshold = 100; // 閾値を大きめに設定
-            int continuousPixels = 60; // 連続する「ほぼ0」領域の最小長さ
+            int continuousPixels = 120; // 連続する「ほぼ0」領域の最小長さ
             int count = 0;
             for (int i = 1; i < gradient.Count; i++) {
                 if (count == 4) { break; }
@@ -96,7 +89,7 @@ namespace HealthBar {
             }
 
             // minHPBoundary から maxHPBoundary の方向へスライドして gradient を確認
-            for (int x = minHPBoundary-5; x >= maxHPBoundary; x--) {
+            for (int x = minHPBoundary-10; x >= maxHPBoundary; x--) {
                 // gradient が閾値を超えた場合にその位置を境界として設定
                 if (gradient[x] > threshold) {
                     tempBoundary = x;
@@ -132,7 +125,7 @@ namespace HealthBar {
                 //100%とする体力ゲージの設定
                 form.healthPercents.Clear();
                 //iはフレーム番号
-                for (int i = 0; i < videoL.TotalFrames; i++) {
+                for (int i = 0; i < form.videoL.TotalFrames; i++) {
                     //今のBoundaryをcurrentBoundaryとして表示
                     //フレーム番号iにおける画像のGradientを出し、それで計算を行う
                     currentBoundary = AnalyzeBoundary(form.caliculate.Gradient1(i, form.selectedY), i, form.selectedY);
@@ -147,7 +140,7 @@ namespace HealthBar {
                         form.healthPercents.Add(hpPercentage);
                     }
                     //進捗報告
-                    progress.Report((i + 1) * 100 / videoL.TotalFrames);
+                    progress.Report((i + 1) * 100 / form.videoL.TotalFrames);
                 }
             });
             MessageBox.Show("全フレームの体力割合の計算が完了しました。", "計算完了", MessageBoxButtons.OK, MessageBoxIcon.Information);

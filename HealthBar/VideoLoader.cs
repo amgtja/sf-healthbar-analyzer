@@ -11,6 +11,7 @@ namespace HealthBar {
         public VideoCapture capture;
         public int TotalFrames { get; set; }
         public int thresh=130;
+        public int currentframe=0;
 
         //動画ファイルを読み込むメソッド
 
@@ -26,6 +27,8 @@ namespace HealthBar {
 
         //特定のフレームを取得する
         public Bitmap GetFrameAt(int frameIndex) {
+
+            //例外処理
             if (capture == null) {
                 throw new InvalidOperationException("動画がロードされていません");
             }
@@ -56,6 +59,28 @@ namespace HealthBar {
             Cv2.FindContours(bwMat, out OpenCvSharp.Point[][] contours, out HierarchyIndex[] hindex, RetrievalModes.List, ContourApproximationModes.ApproxNone);
             Cv2.DrawContours(bwMat, contours, -1, new Scalar(255, 0, 0), 2);
             return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(bwMat);
+
+        }
+        public Bitmap GetFrameRead(int framenumber) {
+
+            //例外処理
+            if (capture == null) {
+                throw new InvalidOperationException("動画がロードされていません");
+            }
+            if (currentframe + 1 == framenumber) {
+                currentframe = framenumber;
+                Mat frame = new Mat();
+                if (capture.Read(frame) && !frame.Empty()) {
+                    return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame);
+                } else { return null; }
+            } else {
+                currentframe = framenumber;
+                capture.PosFrames = currentframe;
+                Mat frame = new Mat();
+                if (capture.Read(frame) && !frame.Empty()) {
+                    return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame);
+                } else { return null; }
+            }
 
         }
 

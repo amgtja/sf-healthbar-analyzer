@@ -22,11 +22,11 @@ namespace HealthBar {
         public List<int> gradients = new List<int>();
         public List<byte> brightnessValues = new List<byte>();
         public (List<byte>, List<byte>, List<byte>) rgbValues = (new List<byte>(), new List<byte>(), new List<byte>());
-        VideoLoader videoL = new VideoLoader();
+        public VideoLoader videoL = new VideoLoader();
         public Charts charts;
         public Caliculate caliculate;
         public Boundary boundary;
-        
+
         public CancellationTokenSource cancellationTokenSource;
 
         public string filePath = null;
@@ -40,6 +40,10 @@ namespace HealthBar {
 
             //ファイルパス表示or非表示
             FileDisplay.Visible = false;
+            pictureBoxBW.Visible = false;
+            chartDataGray.Visible = false;
+            chartData.Visible = false;
+            chartG.Visible = false;
 
             //Paintイベント
             pictureBoxFrame.Paint += PictureBoxFrame_Paint;
@@ -65,7 +69,7 @@ namespace HealthBar {
             if (!string.IsNullOrEmpty(filePath) && videoL.LoadVideo(filePath)) {
 
                 //最初のフレームを取得
-                Bitmap frame = videoL.GetFrameAt(0);
+                Bitmap frame = videoL.GetFrameRead(0);
                 if (frame != null) {
                     pictureBoxFrame.Image = frame;
                     //trackBarFrameのMax設定
@@ -76,7 +80,6 @@ namespace HealthBar {
             } else {
                 MessageBox.Show("動画の読み込みに失敗しました", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            caliculate.LoadVideo(filePath);
 
         }
 
@@ -133,10 +136,10 @@ namespace HealthBar {
 
             // 描画のためのバーの高さと位置を設定
             int barHeight = 20;
-            int barY = pictureBoxFrame.Height - barHeight - 20;
+            int barY = pictureBoxFrame.Height - 300;
 
             // 横棒の背景を描画
-            g.FillRectangle(Brushes.Gray, boundary.maxHPBoundary, barY, (boundary.minHPBoundary - boundary.maxHPBoundary), barHeight);
+            g.FillRectangle(Brushes.Green, boundary.maxHPBoundary, barY, (boundary.minHPBoundary - boundary.maxHPBoundary), barHeight);
 
             // 現在のフレームの体力割合に応じたバーを描画
             int currentFrameIndex = trackBarFrame.Value;
@@ -145,14 +148,14 @@ namespace HealthBar {
                 Console.WriteLine($"Frame: {currentFrameIndex}, HP Percent: {hpPercent}");
 
                 int maxWidth = boundary.minHPBoundary - boundary.maxHPBoundary;
-                int barWidth = (int)(maxWidth * hpPercent / 100.0);
+                int barWidth = (int)(maxWidth * (1- hpPercent / 100.0));
 
                 // 体力割合を示すバーを描画（緑色）
-                g.FillRectangle(Brushes.Green, boundary.maxHPBoundary, barY, barWidth, barHeight);
+                g.FillRectangle(Brushes.Gray, boundary.maxHPBoundary, barY, barWidth, barHeight);
 
                 // 体力%をテキストで表示
                 string percentText = $"{hpPercent:F1}%";
-                g.DrawString(percentText, this.Font, Brushes.Black, barWidth + 5, barY - 15);
+                HealthText.Text = percentText ;
             }
         }
         public void UpdateHPDisplay() {
@@ -170,15 +173,15 @@ namespace HealthBar {
 
 
         public void TrackBarFrame_Scroll(object sender, EventArgs e) {
-            pictureBoxFrame.Image = videoL.GetFrameAt(trackBarFrame.Value);
+            pictureBoxFrame.Image = videoL.GetFrameRead(trackBarFrame.Value);
             pictureBoxBW.Image = videoL.ToBW(trackBarFrame.Value);
+            FrameBox.Text = (videoL.currentframe.ToString());
         }
 
 
         public void AnalyzeB_Click(object sender, EventArgs e) {
             string boundariesString = string.Join(", ", boundaries);
             MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            boundary.LoadVideo(filePath);
         }
 
         public void SetBaseBoundaryB_Click(object sender, EventArgs e) {

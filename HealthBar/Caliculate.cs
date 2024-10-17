@@ -9,24 +9,17 @@ using System.Threading.Tasks;
 namespace HealthBar {
     public class Caliculate {
         public HPBarForm form;
-        private VideoLoader videoL;
 
         public Caliculate(HPBarForm form) {
             this.form = form;
-            this.videoL = new VideoLoader();
-        }
-        public void LoadVideo(string filePath) {
-            if (!videoL.LoadVideo(filePath)) {
-                throw new Exception("ロード失敗");
-            }
         }
 
         public List<byte> GetBright(int currentFrame, int y) {
             List<byte> brightValue = new List<byte>();
-            Bitmap frameBitmap = videoL.GetFrameAt(currentFrame);
+            Bitmap frameBitmap = form.videoL.GetFrameRead(currentFrame);
 
             int width = frameBitmap.Width;
-            Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(videoL.GetFrameAt(currentFrame));
+            Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(form.videoL.GetFrameRead(currentFrame));
             for (int x = 0; x < width; x++) {
                 byte brightness = frame.At<byte>(y, x);
                 brightValue.Add(brightness);
@@ -38,7 +31,7 @@ namespace HealthBar {
             List<byte> gValues = new List<byte>();
             List<byte> bValues = new List<byte>();
 
-            Bitmap frameBitmap = videoL.GetFrameAt(currentFrame);
+            Bitmap frameBitmap = form.videoL.GetFrameRead(currentFrame);
             Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(frameBitmap);
 
             for (int x = 0; x < frame.Width; x++) {
@@ -52,7 +45,7 @@ namespace HealthBar {
         public List<int> Gradient1(int currentFrame, int y) {
             List<int> gradients = new List<int>();
 
-            Bitmap frameBitmap = videoL.GetFrameAt(currentFrame);
+            Bitmap frameBitmap = form.videoL.GetFrameRead(currentFrame);
             Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(frameBitmap);
 
             // RGB値の総和を計算し、輝度の代わり
