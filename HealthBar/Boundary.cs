@@ -89,13 +89,18 @@ namespace HealthBar {
             }
 
             // minHPBoundary から maxHPBoundary の方向へスライドして gradient を確認
-            for (int x = minHPBoundary-10; x >= maxHPBoundary; x--) {
+            bool key = false;
+            for (int x = minHPBoundary-15; x >= maxHPBoundary; x--) {
                 // gradient が閾値を超えた場合にその位置を境界として設定
                 if (gradient[x] > threshold) {
                     tempBoundary = x;
                     Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary} with gradient {gradient[x]}.");
                     return tempBoundary;
+                    key = true;
                 }
+            }
+            if (!key) {
+                return maxHPBoundary;
             }
 
             // 何も検出されなかった場合は、最小の境界を返す

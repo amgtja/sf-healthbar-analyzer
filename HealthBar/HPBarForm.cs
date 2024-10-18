@@ -42,8 +42,8 @@ namespace HealthBar {
             FileDisplay.Visible = false;
             pictureBoxBW.Visible = false;
             chartDataGray.Visible = false;
-            chartData.Visible = false;
-            chartG.Visible = false;
+            //chartData.Visible = false;
+            //chartG.Visible = false;
 
             //Paintイベント
             pictureBoxFrame.Paint += PictureBoxFrame_Paint;
