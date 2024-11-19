@@ -73,7 +73,11 @@ namespace HealthBar {
                 if (frame != null) {
                     pictureBoxFrame.Image = frame;
                     //trackBarFrameのMax設定
+                    trackBarFrame.Minimum = 0;
                     trackBarFrame.Maximum = videoL.TotalFrames - 1;
+                    trackBarFrame.SmallChange = 1; // 矢印キーやクリックで1フレーム進む
+                    trackBarFrame.LargeChange = 1; // ページアップ・ダウンで1フレーム進む
+                    
                 } else {
                     MessageBox.Show("フレーム取得失敗", "error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -225,6 +229,10 @@ namespace HealthBar {
         }
 
         private void pictureBoxFrame_Click(object sender, EventArgs e) {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e) {
 
         }
     }
