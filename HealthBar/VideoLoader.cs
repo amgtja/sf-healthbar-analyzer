@@ -9,9 +9,15 @@ using OpenCvSharp;
 namespace HealthBar {
     public class VideoLoader {
         public VideoCapture capture;
+        public HPBarForm form;
         public int TotalFrames { get; set; }
         public int thresh=130;
         public int currentframe=0;
+        public Bitmap originalBitmap;
+        public Bitmap scaledBitmap;
+        public VideoLoader(HPBarForm form) {
+            this.form = form;
+        }
 
         //動画ファイルを読み込むメソッド
 
@@ -71,17 +77,23 @@ namespace HealthBar {
                 currentframe = framenumber;
                 Mat frame = new Mat();
                 if (capture.Read(frame) && !frame.Empty()) {
-                    return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame);
+                    return ScaledDisplay(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame));
                 } else { return null; }
             } else {
                 currentframe = framenumber;
                 capture.PosFrames = currentframe;
                 Mat frame = new Mat();
                 if (capture.Read(frame) && !frame.Empty()) {
-                    return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame);
+                    return ScaledDisplay(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame));
                 } else { return null; }
             }
 
+        }
+        public Bitmap ScaledDisplay(Bitmap frame) {
+            if (frame == null) return null;
+            originalBitmap = frame;
+            scaledBitmap = new Bitmap(originalBitmap, form.pictureBoxFrame.Width, form.pictureBoxFrame.Height);
+            return scaledBitmap;
         }
 
     }

@@ -22,10 +22,11 @@ namespace HealthBar {
         public List<int> gradients = new List<int>();
         public List<byte> brightnessValues = new List<byte>();
         public (List<byte>, List<byte>, List<byte>) rgbValues = (new List<byte>(), new List<byte>(), new List<byte>());
-        public VideoLoader videoL = new VideoLoader();
+        public VideoLoader videoL;
         public Charts charts;
         public Caliculate caliculate;
         public Boundary boundary;
+
 
         public CancellationTokenSource cancellationTokenSource;
 
@@ -33,6 +34,7 @@ namespace HealthBar {
         public int selectedY = 0;
         public HPBarForm() {
             InitializeComponent();
+            videoL = new VideoLoader(this);
             charts = new Charts(this);
             boundary = new Boundary(this);
             caliculate = new Caliculate(this);
@@ -54,6 +56,7 @@ namespace HealthBar {
             trackBarFrame.Scroll += TrackBarFrame_Scroll;
         }
 
+
         public void FileSelectB_Click(object sender, EventArgs e) {
             //selectedFにファイルパス入れる
             //0フレーム目の取得、pictureBoxFrameにBitmap形式のframeを代入して表示させる
@@ -71,7 +74,7 @@ namespace HealthBar {
                 //最初のフレームを取得
                 Bitmap frame = videoL.GetFrameRead(0);
                 if (frame != null) {
-                    pictureBoxFrame.Image = frame;
+                    videoL.ScaledDisplay(frame);
                     //trackBarFrameのMax設定
                     trackBarFrame.Minimum = 0;
                     trackBarFrame.Maximum = videoL.TotalFrames - 1;
@@ -118,14 +121,14 @@ namespace HealthBar {
             foreach (int x in boundaries) {
                 boundaryPoints.Add(new System.Drawing.Point(x, selectedY));
             }
-            pictureBoxFrame.Invalidate();
+            pictureBoxFrame.Refresh();
             //MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         }
         public void PictureBoxFrame_Paint(object sender, PaintEventArgs e) {
             Graphics g = e.Graphics;
             Brush brush = Brushes.Red; // 点の色を指定
-            int pointSize = 5; // 点のサイズ
+            int pointSize = 10; // 点のサイズ
 
             // 境界のポイントを描画
             foreach (System.Drawing.Point point in boundaryPoints) {
@@ -206,6 +209,15 @@ namespace HealthBar {
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK) {
                 boundary.SaveHPPercentagesToCSV(saveFileDialog.FileName);
+            }
+        }
+
+        public async Task PlayFrame(CancellationToken cancellationToken) {
+            while (trackBarFrame.Value < videoL.TotalFrames) {
+                cancellationToken.ThrowIfCancellationRequested();
+                videoL.GetFrameRead(trackBarFrame.Value);
+                trackBarFrame.Value++;
+                await Task.Delay(33);
             }
         }
         public void pictureBoxBW_Click(object sender, EventArgs e) {
