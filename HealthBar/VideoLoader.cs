@@ -87,7 +87,6 @@ namespace HealthBar {
                     return ScaledDisplay(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame));
                 } else { return null; }
             }
-
         }
         public Bitmap ScaledDisplay(Bitmap frame) {
             if (frame == null) return null;

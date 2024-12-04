@@ -26,7 +26,8 @@ namespace HealthBar {
         public Charts charts;
         public Caliculate caliculate;
         public Boundary boundary;
-
+        //chartのON/OFF機能
+        bool chartOn = true;
 
         public CancellationTokenSource cancellationTokenSource;
 
@@ -47,6 +48,8 @@ namespace HealthBar {
             //chartData.Visible = false;
             //chartG.Visible = false;
 
+
+
             //Paintイベント
             pictureBoxFrame.Paint += PictureBoxFrame_Paint;
         }
@@ -54,6 +57,8 @@ namespace HealthBar {
         public void HPBar_Load(object sender, EventArgs e) {
             trackBarFrame.Minimum = 0;
             trackBarFrame.Scroll += TrackBarFrame_Scroll;
+            //再生ボタンbtnPlayの表示
+            btnPlay.Text = "動画がロードされていません";
         }
 
 
@@ -80,7 +85,7 @@ namespace HealthBar {
                     trackBarFrame.Maximum = videoL.TotalFrames - 1;
                     trackBarFrame.SmallChange = 1; // 矢印キーやクリックで1フレーム進む
                     trackBarFrame.LargeChange = 1; // ページアップ・ダウンで1フレーム進む
-                    
+                    btnPlay.Text = "再生/停止";
                 } else {
                     MessageBox.Show("フレーム取得失敗", "error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -100,19 +105,10 @@ namespace HealthBar {
             selectedY = e.Y;
             BrightText.Text = selectedY.ToString();
 
-            //RGB値を出してみる
-            rgbValues = caliculate.GetRGB(trackBarFrame.Value, selectedY);
-            charts.DrawChartRGB(rgbValues);
 
-            //輝度を出してみる
-            brightnessValues = caliculate.GetBright(trackBarFrame.Value, selectedY);
-            charts.DrawChart(brightnessValues);
-
-            //隣のピクセルとの差分を見てみる
-            gradients = caliculate.Gradient1(trackBarFrame.Value, selectedY);
-            charts.DrawChartGradient(gradients);
 
             //境界線を探す
+            gradients = caliculate.Gradient1(trackBarFrame.Value, selectedY);
             boundaries = boundary.FindBoundary(gradients);
             //string boundariesString = string.Join(", ", boundaries);
 
@@ -124,16 +120,39 @@ namespace HealthBar {
             pictureBoxFrame.Refresh();
             //MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+            if (chartOn) {
+                //RGB値を出してみる
+                rgbValues = caliculate.GetRGB(trackBarFrame.Value, selectedY);
+                charts.DrawChartRGB(rgbValues);
+
+                //輝度を出してみる
+                brightnessValues = caliculate.GetBright(trackBarFrame.Value, selectedY);
+                charts.DrawChart(brightnessValues);
+
+                //隣のピクセルとの差分を見てみる
+                
+                charts.DrawChartGradient(gradients);
+            }
         }
         public void PictureBoxFrame_Paint(object sender, PaintEventArgs e) {
             Graphics g = e.Graphics;
             Brush brush = Brushes.Red; // 点の色を指定
-            int pointSize = 10; // 点のサイズ
+            int pointSize = 8; // 点のサイズ
 
             // 境界のポイントを描画
             foreach (System.Drawing.Point point in boundaryPoints) {
                 g.FillEllipse(brush, point.X - pointSize / 2, point.Y - pointSize / 2, pointSize, pointSize);
             }
+            if (boundaryPoints.Count == 4) {
+                Pen redPen = new Pen(Color.Red, 2);
+                // 1Pの線分
+                g.DrawLine(redPen, boundaryPoints[0].X, boundaryPoints[0].Y, boundaryPoints[1].X, boundaryPoints[1].Y);
+
+                // 2Pの線分
+                g.DrawLine(redPen, boundaryPoints[2].X, boundaryPoints[2].Y, boundaryPoints[3].X, boundaryPoints[3].Y);
+                redPen.Dispose();
+            }
+
             DrawHealthPercentageBar(e.Graphics);
         }
         private void DrawHealthPercentageBar(Graphics g) {
@@ -146,7 +165,7 @@ namespace HealthBar {
             int barY = pictureBoxFrame.Height - 300;
 
             // 横棒の背景を描画
-            g.FillRectangle(Brushes.Green, boundary.maxHPBoundary, barY, (boundary.minHPBoundary - boundary.maxHPBoundary), barHeight);
+            g.FillRectangle(Brushes.Green, boundary.maxHPBoundary1P, barY, (boundary.minHPBoundary1P - boundary.maxHPBoundary1P), barHeight);
 
             // 現在のフレームの体力割合に応じたバーを描画
             int currentFrameIndex = trackBarFrame.Value;
@@ -154,15 +173,15 @@ namespace HealthBar {
                 double hpPercent = healthPercents[currentFrameIndex];
                 Console.WriteLine($"Frame: {currentFrameIndex}, HP Percent: {hpPercent}");
 
-                int maxWidth = boundary.minHPBoundary - boundary.maxHPBoundary;
-                int barWidth = (int)(maxWidth * (1- hpPercent / 100.0));
+                int maxWidth = boundary.minHPBoundary1P - boundary.maxHPBoundary1P;
+                int barWidth = (int)(maxWidth * (1 - hpPercent / 100.0));
 
                 // 体力割合を示すバーを描画（緑色）
-                g.FillRectangle(Brushes.Gray, boundary.maxHPBoundary, barY, barWidth, barHeight);
+                g.FillRectangle(Brushes.Gray, boundary.maxHPBoundary1P, barY, barWidth, barHeight);
 
                 // 体力%をテキストで表示
                 string percentText = $"{hpPercent:F1}%";
-                HealthText.Text = percentText ;
+                HealthText.Text = percentText;
             }
         }
         public void UpdateHPDisplay() {
@@ -211,15 +230,6 @@ namespace HealthBar {
                 boundary.SaveHPPercentagesToCSV(saveFileDialog.FileName);
             }
         }
-
-        public async Task PlayFrame(CancellationToken cancellationToken) {
-            while (trackBarFrame.Value < videoL.TotalFrames) {
-                cancellationToken.ThrowIfCancellationRequested();
-                videoL.GetFrameRead(trackBarFrame.Value);
-                trackBarFrame.Value++;
-                await Task.Delay(33);
-            }
-        }
         public void pictureBoxBW_Click(object sender, EventArgs e) {
 
         }
@@ -246,6 +256,28 @@ namespace HealthBar {
 
         private void label1_Click(object sender, EventArgs e) {
 
+        }
+
+        private void btnPlay_Click(object sender, EventArgs e) {
+            if (timerFramePlay.Enabled) {
+                timerFramePlay.Enabled = false;
+            } else {
+                timerFramePlay.Enabled = true;
+            }
+        }
+
+        private void timerFramePlay_Tick(object sender, EventArgs e) {
+            if((trackBarFrame.Value < videoL.TotalFrames)) {
+                Bitmap frame = videoL.GetFrameRead(trackBarFrame.Value);
+                pictureBoxFrame.Image = frame;
+                trackBarFrame.Value++;
+            } else {
+                timerFramePlay.Enabled = false;
+            }
+        }
+
+        private void trackBarFrame_ValueChanged(object sender, EventArgs e) {
+            FrameBox.Text = (videoL.currentframe.ToString());
         }
     }
 }

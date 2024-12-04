@@ -13,6 +13,11 @@ namespace HealthBar {
         public Caliculate(HPBarForm form) {
             this.form = form;
         }
+        public List<List<List<int>>> gradients = new List<List<List<int>>>() {
+            new List<List<int>>() {
+                new List<int>()
+            }
+        };
 
         public List<byte> GetBright(int currentFrame, int y) {
             List<byte> brightValue = new List<byte>();
@@ -24,6 +29,8 @@ namespace HealthBar {
                 byte brightness = frame.At<byte>(y, x);
                 brightValue.Add(brightness);
             }
+            frame.Dispose();
+            frameBitmap.Dispose();
             return brightValue;
         }
         public (List<byte> R, List<byte> G, List<byte> B) GetRGB(int currentFrame, int y) {
@@ -40,8 +47,10 @@ namespace HealthBar {
                 gValues.Add(color.Item1); // G成分
                 rValues.Add(color.Item2); // R成分
             }
+            frame.Dispose();
             return (rValues, gValues, bValues);
         }
+
         public List<int> Gradient1(int currentFrame, int y) {
             List<int> gradients = new List<int>();
 
@@ -63,9 +72,10 @@ namespace HealthBar {
                 gradients.Add(gradient);
             }
 
+            frame.Dispose();
+            frameBitmap.Dispose();
             //gradient[X座標]で0に1のX座標が入っている、RGBの総和を出す
             return gradients;
-
         }
     }
 }

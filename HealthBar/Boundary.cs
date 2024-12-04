@@ -11,10 +11,13 @@ using System.Windows.Forms.DataVisualization.Charting;
 namespace HealthBar {
     public class Boundary {
         public HPBarForm form;
-        public int maxHPBoundary = 0;
-        public int minHPBoundary = 0;
+        public int maxHPBoundary1P = 0;
+        public int minHPBoundary1P = 0;
         public int threshold = 100;
-        public int tempBoundary = 0;
+        public int tempBoundary1P = 0;
+        public int maxHPBoundary2P = 0;
+        public int minHPBoundary2P = 0;
+        public int tempBoundary2P = 0;
         public Boundary(HPBarForm form) {
             this.form = form;
         }
@@ -53,76 +56,100 @@ namespace HealthBar {
 
         //gradient(currentFrame, Y座標)
         //ボツ、隠れるとすぐ座標おかしくなる
-        //public int AnalyzeBoundary(List<int> gradient, int currentFrame, int y) {
+        //public int AnalyzeBoundary1P(List<int> gradient, int currentFrame, int y) {
         //    bool breakpoint = false;
         //    //前回の境界の位置から緑の値が大きくなっていたら検出開始にする（黄色のゲージ消費のイメージ）
         //    var (rValues, gValues, bValues) = form.caliculate.GetRGB(currentFrame, y);
         //    if (gradient.All(value => value <= 100)) {
-        //        tempBoundary = maxHPBoundary;
-        //        Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary}.");
-        //        return tempBoundary;
+        //        tempBoundary1P = maxHPBoundary1P;
+        //        Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary1P}.");
+        //        return tempBoundary1P;
         //    }
 
         //    //G成分のチェック
-        //    if (gValues[tempBoundary] > threshold && rValues[tempBoundary] > threshold) {
-        //        for (int x = tempBoundary + 1; x < minHPBoundary; x++) {
+        //    if (gValues[tempBoundary1P] > threshold && rValues[tempBoundary1P] > threshold) {
+        //        for (int x = tempBoundary1P + 1; x < minHPBoundary1P; x++) {
         //            //境界設定
         //            if (gradient[x] > threshold && gValues[x] > threshold) {
-        //                tempBoundary = x;
+        //                tempBoundary1P = x;
         //                breakpoint = true;
         //                break;
         //            }
         //            if (breakpoint) { break; }
         //        }
         //        if (!breakpoint) {
-        //            return minHPBoundary;
+        //            return minHPBoundary1P;
         //        } else {
         //        }
-        //    }return tempBoundary;
+        //    }return tempBoundary1P;
         //}
-        public int AnalyzeBoundary(List<int> gradient, int currentFrame, int y) {
+        public int AnalyzeBoundary1P(List<int> gradient, int currentFrame, int y) {
             // 暗転時のリセット処理：gradient の全ての値が100以下の場合はリセット
             if (gradient.All(value => value <= 100)) {
-                tempBoundary = maxHPBoundary;
-                Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary}.");
-                return tempBoundary;
+                tempBoundary1P = maxHPBoundary1P;
+                Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary1P}.");
+                return tempBoundary1P;
             }
 
-            // minHPBoundary から maxHPBoundary の方向へスライドして gradient を確認
-            bool key = false;
-            for (int x = minHPBoundary-15; x >= maxHPBoundary; x--) {
+            // minHPBoundary1P から maxHPBoundary1P の方向へスライドして gradient を確認
+            for (int x = minHPBoundary1P-6; x >= maxHPBoundary1P; x--) {
                 // gradient が閾値を超えた場合にその位置を境界として設定
                 if (gradient[x] > threshold) {
-                    tempBoundary = x;
-                    Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary} with gradient {gradient[x]}.");
-                    return tempBoundary;
-                    key = true;
+                    tempBoundary1P = x;
+                    Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary1P} with gradient {gradient[x]}.");
+                    return tempBoundary1P;
                 }
             }
-            if (!key) {
-                return maxHPBoundary;
+            // 何も検出されなかった場合は、最小の境界を返す
+            return minHPBoundary1P;
+        }
+        public int AnalyzeBoundary2P(List<int> gradient, int currentFrame, int y) {
+            // 暗転時のリセット処理：gradient の全ての値が100以下の場合はリセット
+            if (gradient.All(value => value <= 100)) {
+                tempBoundary2P = maxHPBoundary2P;
+                Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary2P}.");
+                return tempBoundary2P;
             }
 
+            // minHPBoundary2P から maxHPBoundary2P の方向へスライドして gradient を確認
+            for (int x = minHPBoundary2P + 6; x <= maxHPBoundary1P; x++) {
+                // gradient が閾値を超えた場合にその位置を境界として設定
+                if (gradient[x] > threshold) {
+                    tempBoundary1P = x;
+                    Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary2P} with gradient {gradient[x]}.");
+                    return tempBoundary2P;
+                }
+            }
             // 何も検出されなかった場合は、最小の境界を返す
-            return minHPBoundary;
+            return minHPBoundary2P;
         }
         public void SetBaseBoundaries(List<int> boundaries) {
             if (boundaries.Count >= 2) {
-                maxHPBoundary = boundaries[0];
-                minHPBoundary = boundaries[1];
-                tempBoundary = maxHPBoundary;
-                MessageBox.Show($"基準フレームの境界が設定されました。左端: {maxHPBoundary}, 右端: {minHPBoundary}", "基準設定", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                maxHPBoundary1P = boundaries[0];
+                minHPBoundary1P = boundaries[1];
+                maxHPBoundary2P = boundaries[3];
+                minHPBoundary2P = boundaries[2];
+                tempBoundary1P = maxHPBoundary1P;
+                MessageBox.Show($"基準フレームの境界 1P: {maxHPBoundary1P} - {minHPBoundary1P}, 2P: {minHPBoundary2P} - {maxHPBoundary2P}", "基準設定", MessageBoxButtons.OK, MessageBoxIcon.Information);
             } else {
                 MessageBox.Show("境界が正しく検出されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         public async Task CaliculateAllFrameHP(IProgress<int> progress) {
-            int currentBoundary = maxHPBoundary;
-            int baseHPWidth = minHPBoundary - maxHPBoundary;
-            int currentHPWidth = baseHPWidth;
-            double hpPercentage = 100.0;
-            if (maxHPBoundary == 0 && minHPBoundary == 0) {
-                MessageBox.Show("基準フレームが設定されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            int currentBoundary1P = maxHPBoundary1P;
+            int currentBoundary2P = maxHPBoundary2P;
+            int baseHPWidth1P = Math.Abs(minHPBoundary1P - maxHPBoundary1P);
+            int baseHPWidth2P = Math.Abs(minHPBoundary2P - maxHPBoundary2P);
+            int currentHPWidth1P = baseHPWidth1P;
+            int currentHPWidth2P = baseHPWidth2P;
+            double hpPercentage1P = 100.0;
+            double hpPercentage2P = 100.0;
+            if (maxHPBoundary1P == 0 && minHPBoundary1P == 0) {
+                MessageBox.Show("基準フレームが設定されていません。(1P)", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (maxHPBoundary2P == 0 && minHPBoundary2P == 0) {
+                MessageBox.Show("基準フレームが設定されていません。(2P)", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -133,17 +160,27 @@ namespace HealthBar {
                 for (int i = 0; i < form.videoL.TotalFrames; i++) {
                     //今のBoundaryをcurrentBoundaryとして表示
                     //フレーム番号iにおける画像のGradientを出し、それで計算を行う
-                    currentBoundary = AnalyzeBoundary(form.caliculate.Gradient1(i, form.selectedY), i, form.selectedY);
+                    currentBoundary1P = AnalyzeBoundary1P(form.caliculate.Gradient1(i, form.selectedY), i, form.selectedY);
 
                     //現在の体力割合
-                    currentHPWidth = minHPBoundary - currentBoundary;
+                    currentHPWidth1P = Math.Abs(minHPBoundary1P - maxHPBoundary1P);
 
                     // 体力割合を計算
-                    hpPercentage = (double)currentHPWidth / baseHPWidth * 100;
-                    hpPercentage = Math.Max(0, Math.Min(100, hpPercentage));
+                    hpPercentage1P = (double)currentHPWidth1P / baseHPWidth1P * 100;
+                    hpPercentage1P = Math.Max(0, Math.Min(100, hpPercentage1P));
                     lock (form.healthPercents) {
-                        form.healthPercents.Add(hpPercentage);
+                        form.healthPercents.Add(hpPercentage1P);
                     }
+
+                    //2P
+                    currentBoundary2P = AnalyzeBoundary2P(form.caliculate.Gradient1(i, form.selectedY), i, form.selectedY);
+                    currentHPWidth2P = Math.Abs(minHPBoundary2P - maxHPBoundary2P);
+                    hpPercentage2P = (double)currentHPWidth2P / baseHPWidth2P * 100;
+                    hpPercentage2P = Math.Max(0, Math.Min(100, hpPercentage2P));
+                    lock (form.healthPercents) {
+                        form.healthPercents.Add(hpPercentage2P);
+                    }
+
                     //進捗報告
                     progress.Report((i + 1) * 100 / form.videoL.TotalFrames);
                 }
@@ -152,7 +189,7 @@ namespace HealthBar {
         }
         public void SaveHPPercentagesToCSV(string outputPath) {
             using (StreamWriter sw = new StreamWriter(outputPath)) {
-                sw.WriteLine("Frame,HP1P");
+                sw.WriteLine("Frame,HP1P,HP2P");
                 for (int i = 0; i < form.healthPercents.Count; i++) {
                     sw.WriteLine($"{i},{form.healthPercents[i]}");
                 }
