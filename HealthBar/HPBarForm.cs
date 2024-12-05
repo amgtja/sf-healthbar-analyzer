@@ -16,7 +16,8 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace HealthBar {
     public partial class HPBarForm : Form {
-        public List<double> healthPercents = new List<double>();
+        public List<double> healthPercents1P = new List<double>();
+        public List<double> healthPercents2P = new List<double>();
         public List<System.Drawing.Point> boundaryPoints = new List<System.Drawing.Point>();
         public List<int> boundaries = new List<int>();
         public List<int> gradients = new List<int>();
@@ -156,7 +157,7 @@ namespace HealthBar {
             DrawHealthPercentageBar(e.Graphics);
         }
         private void DrawHealthPercentageBar(Graphics g) {
-            if (healthPercents.Count == 0) {
+            if (healthPercents1P.Count == 0) {
                 return; // 解析結果がない場合は描画しない
             }
 
@@ -166,23 +167,31 @@ namespace HealthBar {
 
             // 横棒の背景を描画
             g.FillRectangle(Brushes.Green, boundary.maxHPBoundary1P, barY, (boundary.minHPBoundary1P - boundary.maxHPBoundary1P), barHeight);
+            //2P
+            g.FillRectangle(Brushes.Green, boundary.minHPBoundary2P, barY, (boundary.maxHPBoundary2P - boundary.minHPBoundary2P), barHeight);
 
             // 現在のフレームの体力割合に応じたバーを描画
             int currentFrameIndex = trackBarFrame.Value;
-            if (currentFrameIndex < healthPercents.Count) {
-                double hpPercent = healthPercents[currentFrameIndex];
-                Console.WriteLine($"Frame: {currentFrameIndex}, HP Percent: {hpPercent}");
+            if (currentFrameIndex < healthPercents1P.Count) {
+                double hpPercent1P = healthPercents1P[currentFrameIndex];
+                double hpPercent2P = healthPercents2P[currentFrameIndex];
+                Console.WriteLine($"Frame: {currentFrameIndex}, HP Percent: {hpPercent1P},{hpPercent2P}");
 
-                int maxWidth = boundary.minHPBoundary1P - boundary.maxHPBoundary1P;
-                int barWidth = (int)(maxWidth * (1 - hpPercent / 100.0));
+                int maxWidth1P = boundary.minHPBoundary1P - boundary.maxHPBoundary1P;
+                int barWidth1P = (int)(maxWidth1P * (1 - hpPercent1P / 100.0));
+                int maxWidth2P = boundary.maxHPBoundary2P - boundary.minHPBoundary2P;
+                int barWidth2P = (int)(maxWidth2P * (1 - hpPercent2P / 100.0));
 
                 // 体力割合を示すバーを描画（緑色）
-                g.FillRectangle(Brushes.Gray, boundary.maxHPBoundary1P, barY, barWidth, barHeight);
+                g.FillRectangle(Brushes.Gray, boundary.maxHPBoundary1P, barY, barWidth1P, barHeight);
+                //2P
+                g.FillRectangle(Brushes.Gray, boundary.minHPBoundary2P, barY, barWidth2P, barHeight);
 
                 // 体力%をテキストで表示
-                string percentText = $"{hpPercent:F1}%";
+                string percentText = $"{hpPercent1P:F1}%,+{","}+{hpPercent2P:F1}%";
                 HealthText.Text = percentText;
             }
+
         }
         public void UpdateHPDisplay() {
             pictureBoxFrame.Invalidate();
@@ -217,7 +226,6 @@ namespace HealthBar {
         public async void CaliculateAllFramesB_Click(object sender, EventArgs e) {
             var progress = new Progress<int>(percent => this.progressBar.Value = percent);
             await boundary.CaliculateAllFrameHP(progress);
-            UpdateHPDisplay();
         }
 
         public void SaveToCSVB_Click(object sender, EventArgs e) {

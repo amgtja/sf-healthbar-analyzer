@@ -87,16 +87,16 @@ namespace HealthBar {
             // 暗転時のリセット処理：gradient の全ての値が100以下の場合はリセット
             if (gradient.All(value => value <= 100)) {
                 tempBoundary1P = maxHPBoundary1P;
-                Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary1P}.");
+                //Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary1P}.");
                 return tempBoundary1P;
             }
 
             // minHPBoundary1P から maxHPBoundary1P の方向へスライドして gradient を確認
-            for (int x = minHPBoundary1P-6; x >= maxHPBoundary1P; x--) {
+            for (int x = minHPBoundary1P - maxHPBoundary1P-5; x > 0; x--) {
                 // gradient が閾値を超えた場合にその位置を境界として設定
                 if (gradient[x] > threshold) {
                     tempBoundary1P = x;
-                    Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary1P} with gradient {gradient[x]}.");
+                    //Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary1P} with gradient {gradient[x]}.");
                     return tempBoundary1P;
                 }
             }
@@ -107,16 +107,16 @@ namespace HealthBar {
             // 暗転時のリセット処理：gradient の全ての値が100以下の場合はリセット
             if (gradient.All(value => value <= 100)) {
                 tempBoundary2P = maxHPBoundary2P;
-                Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary2P}.");
+                //Console.WriteLine($"Frame {currentFrame}: Screen is dark. Resetting currentBoundary to {tempBoundary2P}.");
                 return tempBoundary2P;
             }
 
             // minHPBoundary2P から maxHPBoundary2P の方向へスライドして gradient を確認
-            for (int x = minHPBoundary2P + 6; x <= maxHPBoundary1P; x++) {
+            for (int x = 5;x<maxHPBoundary2P-minHPBoundary2P;x++) {
                 // gradient が閾値を超えた場合にその位置を境界として設定
                 if (gradient[x] > threshold) {
                     tempBoundary1P = x;
-                    Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary2P} with gradient {gradient[x]}.");
+                    //Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary2P} with gradient {gradient[x]}.");
                     return tempBoundary2P;
                 }
             }
@@ -138,8 +138,8 @@ namespace HealthBar {
         public async Task CaliculateAllFrameHP(IProgress<int> progress) {
             int currentBoundary1P = maxHPBoundary1P;
             int currentBoundary2P = maxHPBoundary2P;
-            int baseHPWidth1P = Math.Abs(minHPBoundary1P - maxHPBoundary1P);
-            int baseHPWidth2P = Math.Abs(minHPBoundary2P - maxHPBoundary2P);
+            int baseHPWidth1P = minHPBoundary1P - maxHPBoundary1P;
+            int baseHPWidth2P = maxHPBoundary2P - minHPBoundary2P;
             int currentHPWidth1P = baseHPWidth1P;
             int currentHPWidth2P = baseHPWidth2P;
             double hpPercentage1P = 100.0;
@@ -155,30 +155,29 @@ namespace HealthBar {
 
             await Task.Run(() => {
                 //100%とする体力ゲージの設定
-                form.healthPercents.Clear();
+                form.healthPercents1P.Clear();
+                form.healthPercents2P.Clear();
                 //iはフレーム番号
                 for (int i = 0; i < form.videoL.TotalFrames; i++) {
                     //今のBoundaryをcurrentBoundaryとして表示
                     //フレーム番号iにおける画像のGradientを出し、それで計算を行う
-                    currentBoundary1P = AnalyzeBoundary1P(form.caliculate.Gradient1(i, form.selectedY), i, form.selectedY);
+                    currentBoundary1P = AnalyzeBoundary1P(form.caliculate.GradientNarrow(i, form.selectedY, maxHPBoundary1P,minHPBoundary1P), i, form.selectedY);
+                    currentBoundary2P = AnalyzeBoundary2P(form.caliculate.GradientNarrow(i, form.selectedY, minHPBoundary2P, maxHPBoundary2P), i, form.selectedY);
 
                     //現在の体力割合
-                    currentHPWidth1P = Math.Abs(minHPBoundary1P - maxHPBoundary1P);
+                    currentHPWidth1P = minHPBoundary1P - maxHPBoundary1P;
+                    currentHPWidth2P = maxHPBoundary2P - minHPBoundary2P;
 
                     // 体力割合を計算
                     hpPercentage1P = (double)currentHPWidth1P / baseHPWidth1P * 100;
                     hpPercentage1P = Math.Max(0, Math.Min(100, hpPercentage1P));
-                    lock (form.healthPercents) {
-                        form.healthPercents.Add(hpPercentage1P);
+                    lock (form.healthPercents1P) {
+                        form.healthPercents1P.Add(hpPercentage1P);
                     }
-
-                    //2P
-                    currentBoundary2P = AnalyzeBoundary2P(form.caliculate.Gradient1(i, form.selectedY), i, form.selectedY);
-                    currentHPWidth2P = Math.Abs(minHPBoundary2P - maxHPBoundary2P);
                     hpPercentage2P = (double)currentHPWidth2P / baseHPWidth2P * 100;
                     hpPercentage2P = Math.Max(0, Math.Min(100, hpPercentage2P));
-                    lock (form.healthPercents) {
-                        form.healthPercents.Add(hpPercentage2P);
+                    lock (form.healthPercents2P) {
+                        form.healthPercents2P.Add(hpPercentage2P);
                     }
 
                     //進捗報告
@@ -186,12 +185,13 @@ namespace HealthBar {
                 }
             });
             MessageBox.Show("全フレームの体力割合の計算が完了しました。", "計算完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            form.UpdateHPDisplay();
         }
         public void SaveHPPercentagesToCSV(string outputPath) {
             using (StreamWriter sw = new StreamWriter(outputPath)) {
                 sw.WriteLine("Frame,HP1P,HP2P");
-                for (int i = 0; i < form.healthPercents.Count; i++) {
-                    sw.WriteLine($"{i},{form.healthPercents[i]}");
+                for (int i = 0; i < form.healthPercents1P.Count; i++) {
+                    sw.WriteLine($"{i},{form.healthPercents1P[i]},{form.healthPercents2P[i]}");
                 }
             }
 

@@ -34,20 +34,20 @@
 
 //            //現在の体力を返す
 //            double healthPercent = 100 * (1.0 - (double)changingPixels / totalPixels);
-//            healthPercents.Add(healthPercent);
+//            healthPercents1P.Add(healthPercent);
 
 //            return healthPercent;
 //        }
 //        public void DrawHealthBarGraph(int currentFrameIndex) {
-//            if (healthPercents.Count == 0 || currentFrameIndex >= healthPercents.Count) return;
+//            if (healthPercents1P.Count == 0 || currentFrameIndex >= healthPercents1P.Count) return;
 //            Bitmap graphBitmap = new Bitmap(pictureBoxHP.Width, pictureBoxHP.Height);
 //            using (Graphics g = Graphics.FromImage(graphBitmap)) {
 //                g.Clear(Color.White);
-//                int barWidth = pictureBoxHP.Width / healthPercents.Count;
+//                int barWidth = pictureBoxHP.Width / healthPercents1P.Count;
 //                int maxHeight = pictureBoxHP.Height;
 
-//                for (int i = 0; i < healthPercents.Count; i++) {
-//                    double percent = healthPercents[i];
+//                for (int i = 0; i < healthPercents1P.Count; i++) {
+//                    double percent = healthPercents1P[i];
 //                    int barHeight = (int)(maxHeight * (percent / 100));
 //                    //ハイライト
 //                    Brush brush = i == currentFrameIndex ? Brushes.Red : Brushes.Blue;
