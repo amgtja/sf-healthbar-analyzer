@@ -13,11 +13,6 @@ namespace HealthBar {
         public Caliculate(HPBarForm form) {
             this.form = form;
         }
-        public List<List<List<int>>> gradients = new List<List<List<int>>>() {
-            new List<List<int>>() {
-                new List<int>()
-            }
-        };
 
         public List<byte> GetBright(int currentFrame, int y) {
             List<byte> brightValue = new List<byte>();
@@ -48,6 +43,7 @@ namespace HealthBar {
                 rValues.Add(color.Item2); // R成分
             }
             frame.Dispose();
+            frameBitmap.Dispose();
             return (rValues, gValues, bValues);
         }
 

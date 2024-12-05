@@ -165,17 +165,16 @@ namespace HealthBar {
                     currentBoundary2P = AnalyzeBoundary2P(form.caliculate.GradientNarrow(i, form.selectedY, minHPBoundary2P, maxHPBoundary2P), i, form.selectedY);
 
                     //現在の体力割合
-                    currentHPWidth1P = minHPBoundary1P - maxHPBoundary1P;
-                    currentHPWidth2P = maxHPBoundary2P - minHPBoundary2P;
+                    currentHPWidth1P = minHPBoundary1P - currentBoundary1P;
+                    currentHPWidth2P = maxHPBoundary2P - currentBoundary2P;
 
                     // 体力割合を計算
                     hpPercentage1P = (double)currentHPWidth1P / baseHPWidth1P * 100;
-                    hpPercentage1P = Math.Max(0, Math.Min(100, hpPercentage1P));
+                    Console.WriteLine($"{i},{currentBoundary1P},{currentHPWidth1P},{hpPercentage1P}");
                     lock (form.healthPercents1P) {
                         form.healthPercents1P.Add(hpPercentage1P);
                     }
                     hpPercentage2P = (double)currentHPWidth2P / baseHPWidth2P * 100;
-                    hpPercentage2P = Math.Max(0, Math.Min(100, hpPercentage2P));
                     lock (form.healthPercents2P) {
                         form.healthPercents2P.Add(hpPercentage2P);
                     }
