@@ -49,7 +49,6 @@ namespace HealthBar {
 
         public List<int> Gradient1(int currentFrame, int y) {
             List<int> gradients = new List<int>();
-
             Bitmap frameBitmap = form.videoL.GetFrameRead(currentFrame);
             Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(frameBitmap);
 

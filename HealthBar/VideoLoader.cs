@@ -11,10 +11,10 @@ namespace HealthBar {
         public VideoCapture capture;
         public HPBarForm form;
         public int TotalFrames { get; set; }
-        public int thresh=130;
-        public int currentframe=0;
+        public int currentframe = -1;
         public Bitmap originalBitmap;
         public Bitmap scaledBitmap;
+        public Mat reusableFrame = new Mat();
         public VideoLoader(HPBarForm form) {
             this.form = form;
         }
@@ -27,71 +27,63 @@ namespace HealthBar {
             //動画ファイルの読み込み確認
             if (!capture.IsOpened()) { return false; } else {
                 TotalFrames = (int)capture.FrameCount;
+                currentframe = -1;
                 return true;
             }
         }
 
-        //特定のフレームを取得する
-        public Bitmap GetFrameAt(int frameIndex) {
-
-            //例外処理
-            if (capture == null) {
-                throw new InvalidOperationException("動画がロードされていません");
-            }
-            int totalFrames = (int)capture.FrameCount;
-            if (frameIndex < 0 || frameIndex >= totalFrames) {
-                throw new ArgumentOutOfRangeException(nameof(frameIndex));
-            }
-
-            //指定されたフレームにシーク
-            capture.Set(VideoCaptureProperties.PosFrames, frameIndex);
-
-            //フレーム取得
-            Mat frame = new Mat();
-            if (capture.Read(frame) && !frame.Empty()) {
-                return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame);
-            } else { return null; }
-        }
-        public Bitmap ToBW(int frameIndex) {
-            //画像をグレースケールで出力させてみる
-            Mat frameTemp = OpenCvSharp.Extensions.BitmapConverter.ToMat(GetFrameAt(frameIndex));
-            Mat grayMat = new Mat();
-            Cv2.CvtColor(frameTemp, grayMat, ColorConversionCodes.BGR2GRAY);
-            return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(grayMat);
-            //画像を二値化（白黒に）
-            Mat bwMat = new Mat();
-            Cv2.Threshold(grayMat, bwMat, thresh, 255, ThresholdTypes.Binary);
-            return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(bwMat);
-            Cv2.FindContours(bwMat, out OpenCvSharp.Point[][] contours, out HierarchyIndex[] hindex, RetrievalModes.List, ContourApproximationModes.ApproxNone);
-            Cv2.DrawContours(bwMat, contours, -1, new Scalar(255, 0, 0), 2);
-            return OpenCvSharp.Extensions.BitmapConverter.ToBitmap(bwMat);
-
-        }
         public Bitmap GetFrameRead(int framenumber) {
 
             //例外処理
             if (capture == null) {
                 throw new InvalidOperationException("動画がロードされていません");
             }
+            using (Mat frame = new Mat()) {
+                if (currentframe + 1 == framenumber) {
+                    currentframe = framenumber;
+                    if (capture.Read(frame) && !frame.Empty()) {
+                        return ScaledDisplay(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame));
+                    } else { return null; }
+                } else {
+                    currentframe = framenumber;
+                    capture.PosFrames = currentframe;
+                    if (capture.Read(frame) && !frame.Empty()) {
+                        return ScaledDisplay(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame));
+                    } else { return null; }
+                }
+            }
+        }
+        public void GetFrameMat(int framenumber) {
+
+            //例外処理
+            if (capture == null) {
+                throw new InvalidOperationException("動画がロードされていません");
+            }
+            Mat frame = new Mat();
             if (currentframe + 1 == framenumber) {
                 currentframe = framenumber;
-                Mat frame = new Mat();
-                if (capture.Read(frame) && !frame.Empty()) {
-                    return ScaledDisplay(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame));
-                } else { return null; }
+                try {
+                    capture.Read(frame);
+                    reusableFrame = frame;
+                } catch (Exception e) {
+                    Console.WriteLine(e);
+                }
             } else {
                 currentframe = framenumber;
                 capture.PosFrames = currentframe;
-                Mat frame = new Mat();
-                if (capture.Read(frame) && !frame.Empty()) {
-                    return ScaledDisplay(OpenCvSharp.Extensions.BitmapConverter.ToBitmap(frame));
-                } else { return null; }
+                try {
+                    capture.Read(frame);
+                    reusableFrame = frame;
+                } catch (Exception e) {
+                    Console.WriteLine(e);
+                }
             }
+            frame.Dispose();
         }
         public Bitmap ScaledDisplay(Bitmap frame) {
             if (frame == null) return null;
             originalBitmap = frame;
-            scaledBitmap = new Bitmap(originalBitmap, form.pictureBoxFrame.Width, form.pictureBoxFrame.Height);
+            scaledBitmap = new Bitmap(originalBitmap, form.pictureBoxFrame.Width, 720);
             return scaledBitmap;
         }
 

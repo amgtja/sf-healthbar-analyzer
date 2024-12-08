@@ -16,29 +16,30 @@ namespace HealthBar {
             this.form = form;
         }
         public void DrawChart(List<byte> data) {
-            //初期化
             form.chartDataGray.Series.Clear();
             form.chartDataGray.ChartAreas.Clear();
-            //新しいエリアとシリーズの確保
+
             ChartArea chartArea = new ChartArea("BrightnessArea");
             form.chartDataGray.ChartAreas.Add(chartArea);
+
             Series series = new Series("Brightness") {
-                ChartType = SeriesChartType.Column
+                ChartType = SeriesChartType.Column,
+                IsVisibleInLegend = legend
             };
             form.chartDataGray.Series.Add(series);
-            //凡例なし
-            series.IsVisibleInLegend = legend;
-            //輝度データ追加
-            for (int x = 0; x < data.Count; x++) {
-                series.Points.AddXY(x, data[x]);
-            }
+
+            // DataBindXY を使ってデータを一度に追加
+            series.Points.DataBindXY(Enumerable.Range(0, data.Count), data);
+
             form.chartDataGray.ChartAreas["BrightnessArea"].AxisX.Title = "X座標";
             form.chartDataGray.ChartAreas["BrightnessArea"].RecalculateAxesScale();
         }
+
         public void DrawChartGradient(List<int> data) {
             //初期化
             form.chartG.Series.Clear();
             form.chartG.ChartAreas.Clear();
+
             //新しいエリアとシリーズの確保
             ChartArea chartArea = new ChartArea("GradientsArea");
             form.chartG.ChartAreas.Add(chartArea);
@@ -57,7 +58,8 @@ namespace HealthBar {
         }
         public void DrawChartRGB((List<byte> R, List<byte> G, List<byte> B) rgbValues) {
             form.chartData.Series.Clear();
-            form.chartData.ChartAreas.Clear();
+            form.chartData.ChartAreas.Clear(); 
+
             ChartArea chartArea = new ChartArea("RGBArea");
             form.chartData.ChartAreas.Add(chartArea);
             Series seriesR = new Series("Red") {
