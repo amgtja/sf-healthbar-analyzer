@@ -179,7 +179,7 @@ namespace HealthBar {
 
                 g.FillRectangle(Brushes.Green, boundary.maxHPBoundary1P, barY, (boundary.minHPBoundary1P - boundary.maxHPBoundary1P), barHeight);
                 //2P
-                
+
                 g.FillRectangle(Brushes.Green, boundary.minHPBoundary2P, barY, (boundary.maxHPBoundary2P - boundary.minHPBoundary2P), barHeight);
                 // 体力割合を示すバーを描画（灰色で削るスタイル）
                 g.FillRectangle(Brushes.Gray, boundary.maxHPBoundary1P, barY, barWidth1P, barHeight);
@@ -273,7 +273,7 @@ namespace HealthBar {
         }
 
         private void timerFramePlay_Tick(object sender, EventArgs e) {
-            if ((trackBarFrame.Value < videoL.TotalFrames)) {
+            if ((trackBarFrame.Value < videoL.TotalFrames - 1)) {
                 pictureBoxFrame.Image.Dispose();
                 Bitmap frame = videoL.GetFrameRead(trackBarFrame.Value);
                 pictureBoxFrame.Image = frame;

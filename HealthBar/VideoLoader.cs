@@ -14,7 +14,6 @@ namespace HealthBar {
         public int currentframe = -1;
         public Bitmap originalBitmap;
         public Bitmap scaledBitmap;
-        public Mat reusableFrame = new Mat();
         public VideoLoader(HPBarForm form) {
             this.form = form;
         }
@@ -52,33 +51,6 @@ namespace HealthBar {
                     } else { return null; }
                 }
             }
-        }
-        public void GetFrameMat(int framenumber) {
-
-            //例外処理
-            if (capture == null) {
-                throw new InvalidOperationException("動画がロードされていません");
-            }
-            Mat frame = new Mat();
-            if (currentframe + 1 == framenumber) {
-                currentframe = framenumber;
-                try {
-                    capture.Read(frame);
-                    reusableFrame = frame;
-                } catch (Exception e) {
-                    Console.WriteLine(e);
-                }
-            } else {
-                currentframe = framenumber;
-                capture.PosFrames = currentframe;
-                try {
-                    capture.Read(frame);
-                    reusableFrame = frame;
-                } catch (Exception e) {
-                    Console.WriteLine(e);
-                }
-            }
-            frame.Dispose();
         }
         public Bitmap ScaledDisplay(Bitmap frame) {
             if (frame == null) return null;

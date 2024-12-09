@@ -21,7 +21,7 @@ namespace HealthBar {
         public int minHPBoundary2P = 0;
         public int tempBoundary2P = 0;
         public int temp1P = 0;
-        public int temp2P;
+        public int temp2P = 0;
         public int gradientCount1P;
         public int gradientCount2P;
         public int thresholdGradient = 4;
@@ -85,7 +85,7 @@ namespace HealthBar {
             // 1P通常バー
             if (r >= 100 && r <= 250 && g <= 50 && b >= 30 && b <= 150 && r >= b && b >= g) return "1PBar";
             // 2P通常バー
-            if (r <= 200 && g >= 50 && b >= 100 && b >= g && g >= r) return "2PBar";
+            if (g<=220&&g >= 50 && b >= 100 && b >= g && g >= r) return "2PBar";
             // ノイズ
             return "noize";
         }
@@ -116,40 +116,56 @@ namespace HealthBar {
                         //体力25%以下
                         tempBoundary1P = x - 1;
                         Console.WriteLine($"Yellow{currentFrame},x{x}");
-                    } else if (DetectBarState(color) == "noize"&&x>temp1P) {
+                    } else if (DetectBarState(color) == "noize" && x > temp1P) {
                         Console.WriteLine($"Noize{currentFrame},x{x}");
                         gradientCount1P++;
-                    } 
+                    }
                     prevIntensity = intensity;
                 }
                 if (gradientCount1P > thresholdGradient) {
                     tempBoundary1P = temp1P;
                 }
-                
+
                 //KOのKの字が見えて、かつ最後のXがNoizeなら自分のHPを0と判定する
-                if (CheckKOandHPmin(y, frame)) {
+                if (CheckKOandHPmin(y, frame, minHPBoundary1P, -3)) {
                     tempBoundary1P = minHPBoundary1P;
-                    Console.WriteLine($"TempMin");
+                    Console.WriteLine($"1PLostHP");
                 }
                 temp1P = tempBoundary1P;
+                //2P
                 prevIntensity = -threshold;
+                if (temp2P == 0) {
+                    temp2P = maxHPBoundary2P + 1;
+                }
                 gradientCount2P = 0;
-                for (int x = maxHPBoundary2P; x > minHPBoundary2P; x--) {
+                for (int x = maxHPBoundary2P + 1; x > minHPBoundary2P + 3; x--) {
                     color = frame.At<Vec3b>(y, x);
                     intensity = color.Item0 + color.Item1 + color.Item2;
                     gradient = Math.Abs(intensity - prevIntensity);
-
                     if (gradient > threshold && DetectBarState(color) == "2PBar") {
-                        //攻撃を食らっていない、かつ、体力が25%より大きい時
+                        //体力25%より大きい
                         tempBoundary2P = x + 1;
-                    } else if (gradient > threshold) {
-                        //背景で変化が出てしまったとき
-                        gradientCount2P++;
-                    } else if (color.Item0 < color.Item1 || color.Item0 < color.Item2 || color.Item0 < 100) {
+                        Console.WriteLine($"2PBar{currentFrame},x{x}");
+                        //Console.WriteLine($"Frame {currentFrame}: Boundary detected at {tempBoundary1P} with gradient {gradient},{gradientCount1P}.");
+                    } else if (gradient > threshold && DetectBarState(color) == "Yellow") {
+                        //体力25%以下
+                        tempBoundary2P = x + 1;
+                        Console.WriteLine($"Yellow{currentFrame},x{x}");
+                    } else if (DetectBarState(color) == "noize" && x < temp2P) {
+                        Console.WriteLine($"Noize{currentFrame},x{x}");
                         gradientCount2P++;
                     }
                     prevIntensity = intensity;
                 }
+                if (gradientCount2P > thresholdGradient) {
+                    tempBoundary2P = temp2P;
+                }
+                //KOのKの字が見えて、かつ最後のXがNoizeなら自分のHPを0と判定する
+                if (CheckKOandHPmin(y, frame, minHPBoundary2P, +3)) {
+                    tempBoundary2P = minHPBoundary2P;
+                    Console.WriteLine($"2PLostHP");
+                }
+                temp2P =tempBoundary2P;
                 frame.Dispose();
                 frameBitmap.Dispose();
             } catch (Exception ex) {
@@ -207,10 +223,10 @@ namespace HealthBar {
                     }
                     lock (form.errorList) {
                         if (gradientCount1P > thresholdGradient && gradientCount2P > thresholdGradient) {
-                            form.errorList.Add("1P&2P");
+                            form.errorList.Add("3");
                         } else if (gradientCount1P > thresholdGradient) {
-                            form.errorList.Add("1P");
-                        } else if (gradientCount2P > thresholdGradient) { form.errorList.Add("2P"); } else { form.errorList.Add("0"); }
+                            form.errorList.Add("1");
+                        } else if (gradientCount2P > thresholdGradient) { form.errorList.Add("2"); } else { form.errorList.Add("0"); }
                     }
                     Console.WriteLine($"Frame{i},{gradientCount1P},{gradientCount2P}");
                     //進捗報告
@@ -222,7 +238,7 @@ namespace HealthBar {
         }
         public void SaveHPPercentagesToCSV(string outputPath) {
             using (StreamWriter sw = new StreamWriter(outputPath)) {
-                sw.WriteLine("Frame,HP1P,HP2P,x");
+                sw.WriteLine("FrameNumber,LeftHP[%],RightHP[%],ErrorInformation");
                 for (int i = 0; i < form.healthPercents1P.Count; i++) {
                     sw.WriteLine($"{i},{form.healthPercents1P[i]},{form.healthPercents2P[i]},{form.errorList[i]}");
                 }
@@ -230,10 +246,10 @@ namespace HealthBar {
 
             MessageBox.Show("体力割合をCSVに保存しました。", "保存完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        public bool CheckKOandHPmin(int y, Mat frame) {
+        public bool CheckKOandHPmin(int y, Mat frame, int minHPBoundary, int offset) {
             bool allInRange = false;
             Vec3b color;
-            color = frame.At<Vec3b>(y, minHPBoundary1P - 3);
+            color = frame.At<Vec3b>(y, minHPBoundary + offset);
             if (DetectBarState(color) == "noize") {
                 Console.WriteLine($"NoizeClear");
                 allInRange = true;
