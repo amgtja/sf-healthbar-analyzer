@@ -18,7 +18,7 @@ namespace HealthBar {
     public partial class HPBarForm : Form {
         public List<double> healthPercents1P = new List<double>();
         public List<double> healthPercents2P = new List<double>();
-        public List<int> errorList = new List<int>();
+        public List<string> errorList = new List<string>();
         public List<System.Drawing.Point> boundaryPoints = new List<System.Drawing.Point>();
         public List<int> boundaries = new List<int>();
         public List<int> gradients = new List<int>();
@@ -106,8 +106,6 @@ namespace HealthBar {
             selectedY = e.Y;
             BrightText.Text = selectedY.ToString();
 
-
-
             //境界線を探す
             gradients = caliculate.Gradient1(trackBarFrame.Value, selectedY);
             boundaries = boundary.FindBoundary(gradients);
@@ -190,7 +188,7 @@ namespace HealthBar {
                 // 体力%をテキストで表示
                 string percentText = $"{hpPercent1P:F1}%,+{","}+{hpPercent2P:F1}%";
                 HealthText.Text = percentText;
-                textBoxError.Text = errorList[(currentFrameIndex)].ToString();
+                textBoxError.Text = errorList[(currentFrameIndex)];
             }
 
         }
