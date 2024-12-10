@@ -75,9 +75,7 @@
   <ItemGroup>
     <Compile Include="Boundary.cs" />
     <Compile Include="Caliculate.cs" />
-    <Compile Include="Charts.cs" />
     <Compile Include="FileSelector.cs" />
-    <Compile Include="hakaba.cs" />
     <Compile Include="HPBarForm.cs">
       <SubType>Form</SubType>
     </Compile>

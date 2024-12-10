@@ -66,18 +66,7 @@ namespace HealthBar {
             return boundaries;
         }
 
-        public void SetBaseBoundaries(List<int> boundaries) {
-            if (boundaries.Count >= 2) {
-                maxHPBoundary1P = boundaries[0];
-                minHPBoundary1P = boundaries[1];
-                maxHPBoundary2P = boundaries[3];
-                minHPBoundary2P = boundaries[2];
-                tempBoundary1P = maxHPBoundary1P;
-                MessageBox.Show($"基準フレームの境界 1P: {maxHPBoundary1P} - {minHPBoundary1P}, 2P: {minHPBoundary2P} - {maxHPBoundary2P}", "基準設定", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            } else {
-                MessageBox.Show("境界が正しく検出されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+
         public string DetectBarState(Vec3b color) {
             int r = color.Item2, g = color.Item1, b = color.Item0;
             // 黄色バー
@@ -459,6 +448,18 @@ namespace HealthBar {
 
         //--------------------------------------------ここまでStreet Fighter5--------------------------------------------
         //--------------------------------------------ここから共通事項--------------------------------------------
+        public void SetBaseBoundaries(List<int> boundaries) {
+            if (boundaries.Count >= 2) {
+                maxHPBoundary1P = boundaries[0];
+                minHPBoundary1P = boundaries[1];
+                maxHPBoundary2P = boundaries[3];
+                minHPBoundary2P = boundaries[2];
+                tempBoundary1P = maxHPBoundary1P;
+                MessageBox.Show($"基準フレームの境界 1P: {maxHPBoundary1P} - {minHPBoundary1P}, 2P: {minHPBoundary2P} - {maxHPBoundary2P}", "基準設定", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            } else {
+                MessageBox.Show("境界が正しく検出されていません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         public void SaveHPPercentagesToCSV(string outputPath) {
             using (StreamWriter sw = new StreamWriter(outputPath)) {
                 sw.WriteLine("FrameNumber,LeftHP[%],RightHP[%],ErrorInformation");

@@ -29,225 +29,122 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.FileSelectB = new System.Windows.Forms.Button();
-            this.FileDisplay = new System.Windows.Forms.TextBox();
             this.AnalyzeB = new System.Windows.Forms.Button();
             this.pictureBoxFrame = new System.Windows.Forms.PictureBox();
             this.trackBarFrame = new System.Windows.Forms.TrackBar();
             this.ConfigB = new System.Windows.Forms.Button();
-            this.BrightText = new System.Windows.Forms.TextBox();
-            this.chartData = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chartDataGray = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.pictureBoxHP = new System.Windows.Forms.PictureBox();
-            this.chartG = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.SetBaseBoundaryB = new System.Windows.Forms.Button();
             this.CaliculateAllFramesB = new System.Windows.Forms.Button();
             this.SaveToCSVB = new System.Windows.Forms.Button();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.FrameBox = new System.Windows.Forms.TextBox();
-            this.HealthText = new System.Windows.Forms.TextBox();
             this.timerFramePlay = new System.Windows.Forms.Timer(this.components);
             this.btnPlay = new System.Windows.Forms.Button();
-            this.pictureBoxBW = new System.Windows.Forms.PictureBox();
-            this.textBoxError = new System.Windows.Forms.TextBox();
+            this.listBox = new System.Windows.Forms.ListBox();
+            this.buttonSF5 = new System.Windows.Forms.Button();
+            this.buttonSF6 = new System.Windows.Forms.Button();
+            this.buttonClear = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartData)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartDataGray)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartG)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBW)).BeginInit();
             this.SuspendLayout();
             // 
             // FileSelectB
             // 
-            this.FileSelectB.Location = new System.Drawing.Point(739, 649);
-            this.FileSelectB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FileSelectB.Location = new System.Drawing.Point(695, 503);
             this.FileSelectB.Name = "FileSelectB";
-            this.FileSelectB.Size = new System.Drawing.Size(103, 63);
+            this.FileSelectB.Size = new System.Drawing.Size(333, 58);
             this.FileSelectB.TabIndex = 0;
-            this.FileSelectB.Text = "ファイル選択ボタン";
+            this.FileSelectB.Text = "１．ファイル選択ボタン";
             this.FileSelectB.UseVisualStyleBackColor = true;
             this.FileSelectB.Click += new System.EventHandler(this.FileSelectB_Click);
             // 
-            // FileDisplay
-            // 
-            this.FileDisplay.Location = new System.Drawing.Point(755, 716);
-            this.FileDisplay.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.FileDisplay.Name = "FileDisplay";
-            this.FileDisplay.Size = new System.Drawing.Size(529, 20);
-            this.FileDisplay.TabIndex = 1;
-            this.FileDisplay.TextChanged += new System.EventHandler(this.FileDisplay_TextChanged);
-            // 
             // AnalyzeB
             // 
-            this.AnalyzeB.Location = new System.Drawing.Point(926, 567);
+            this.AnalyzeB.Location = new System.Drawing.Point(1080, 761);
+            this.AnalyzeB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.AnalyzeB.Name = "AnalyzeB";
-            this.AnalyzeB.Size = new System.Drawing.Size(352, 66);
+            this.AnalyzeB.Size = new System.Drawing.Size(246, 91);
             this.AnalyzeB.TabIndex = 3;
-            this.AnalyzeB.Text = "解析開始ボタン";
+            this.AnalyzeB.Text = "４．解析設定読み込みボタン";
             this.AnalyzeB.UseVisualStyleBackColor = true;
             this.AnalyzeB.Click += new System.EventHandler(this.AnalyzeB_Click);
             // 
             // pictureBoxFrame
             // 
-            this.pictureBoxFrame.Location = new System.Drawing.Point(4, 1);
+            this.pictureBoxFrame.Location = new System.Drawing.Point(6, 2);
+            this.pictureBoxFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pictureBoxFrame.Name = "pictureBoxFrame";
-            this.pictureBoxFrame.Size = new System.Drawing.Size(1280, 320);
+            this.pictureBoxFrame.Size = new System.Drawing.Size(1920, 492);
             this.pictureBoxFrame.TabIndex = 4;
             this.pictureBoxFrame.TabStop = false;
             this.pictureBoxFrame.Click += new System.EventHandler(this.pictureBoxFrame_Click);
             // 
             // trackBarFrame
             // 
-            this.trackBarFrame.Location = new System.Drawing.Point(644, 521);
+            this.trackBarFrame.Location = new System.Drawing.Point(695, 568);
+            this.trackBarFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.trackBarFrame.Name = "trackBarFrame";
-            this.trackBarFrame.Size = new System.Drawing.Size(640, 45);
+            this.trackBarFrame.Size = new System.Drawing.Size(1231, 69);
             this.trackBarFrame.TabIndex = 5;
             this.trackBarFrame.Scroll += new System.EventHandler(this.TrackBarFrame_Scroll);
             this.trackBarFrame.ValueChanged += new System.EventHandler(this.trackBarFrame_ValueChanged);
             // 
             // ConfigB
             // 
-            this.ConfigB.Location = new System.Drawing.Point(644, 648);
-            this.ConfigB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ConfigB.Location = new System.Drawing.Point(1080, 645);
             this.ConfigB.Name = "ConfigB";
-            this.ConfigB.Size = new System.Drawing.Size(91, 63);
+            this.ConfigB.Size = new System.Drawing.Size(246, 91);
             this.ConfigB.TabIndex = 2;
-            this.ConfigB.Text = "設定";
+            this.ConfigB.Text = "３．座標指定";
             this.ConfigB.UseVisualStyleBackColor = true;
             this.ConfigB.Click += new System.EventHandler(this.ConfigB_Click);
             // 
-            // BrightText
-            // 
-            this.BrightText.Location = new System.Drawing.Point(644, 612);
-            this.BrightText.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.BrightText.Name = "BrightText";
-            this.BrightText.Size = new System.Drawing.Size(91, 20);
-            this.BrightText.TabIndex = 6;
-            this.BrightText.TextChanged += new System.EventHandler(this.TextBox1_TextChanged);
-            // 
-            // chartData
-            // 
-            chartArea1.Name = "ChartArea1";
-            this.chartData.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chartData.Legends.Add(legend1);
-            this.chartData.Location = new System.Drawing.Point(-103, 186);
-            this.chartData.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.chartData.Name = "chartData";
-            series1.ChartArea = "ChartArea1";
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chartData.Series.Add(series1);
-            this.chartData.Size = new System.Drawing.Size(1464, 164);
-            this.chartData.TabIndex = 9;
-            this.chartData.Text = "chart1";
-            // 
-            // chartDataGray
-            // 
-            chartArea2.Name = "ChartArea1";
-            this.chartDataGray.ChartAreas.Add(chartArea2);
-            legend2.Name = "Legend1";
-            this.chartDataGray.Legends.Add(legend2);
-            this.chartDataGray.Location = new System.Drawing.Point(4, 570);
-            this.chartDataGray.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.chartDataGray.Name = "chartDataGray";
-            series2.ChartArea = "ChartArea1";
-            series2.Legend = "Legend1";
-            series2.Name = "Series1";
-            this.chartDataGray.Series.Add(series2);
-            this.chartDataGray.Size = new System.Drawing.Size(78, 37);
-            this.chartDataGray.TabIndex = 10;
-            this.chartDataGray.Click += new System.EventHandler(this.chartDataGray_Click);
-            // 
             // pictureBoxHP
             // 
-            this.pictureBoxHP.Location = new System.Drawing.Point(-1, 431);
-            this.pictureBoxHP.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pictureBoxHP.Location = new System.Drawing.Point(-2, 663);
             this.pictureBoxHP.Name = "pictureBoxHP";
             this.pictureBoxHP.Size = new System.Drawing.Size(0, 0);
             this.pictureBoxHP.TabIndex = 7;
             this.pictureBoxHP.TabStop = false;
             // 
-            // chartG
-            // 
-            chartArea3.Name = "ChartArea1";
-            this.chartG.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.chartG.Legends.Add(legend3);
-            this.chartG.Location = new System.Drawing.Point(4, 354);
-            this.chartG.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.chartG.Name = "chartG";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.chartG.Series.Add(series3);
-            this.chartG.Size = new System.Drawing.Size(1280, 161);
-            this.chartG.TabIndex = 11;
-            this.chartG.Text = "chart1";
-            // 
-            // SetBaseBoundaryB
-            // 
-            this.SetBaseBoundaryB.Location = new System.Drawing.Point(926, 639);
-            this.SetBaseBoundaryB.Name = "SetBaseBoundaryB";
-            this.SetBaseBoundaryB.Size = new System.Drawing.Size(100, 52);
-            this.SetBaseBoundaryB.TabIndex = 12;
-            this.SetBaseBoundaryB.Text = "基準設定";
-            this.SetBaseBoundaryB.UseVisualStyleBackColor = true;
-            this.SetBaseBoundaryB.Click += new System.EventHandler(this.SetBaseBoundaryB_Click);
-            // 
             // CaliculateAllFramesB
             // 
-            this.CaliculateAllFramesB.Location = new System.Drawing.Point(1053, 639);
+            this.CaliculateAllFramesB.Location = new System.Drawing.Point(1352, 761);
+            this.CaliculateAllFramesB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.CaliculateAllFramesB.Name = "CaliculateAllFramesB";
-            this.CaliculateAllFramesB.Size = new System.Drawing.Size(106, 52);
+            this.CaliculateAllFramesB.Size = new System.Drawing.Size(236, 91);
             this.CaliculateAllFramesB.TabIndex = 13;
-            this.CaliculateAllFramesB.Text = "計算開始";
+            this.CaliculateAllFramesB.Text = "５．解析開始";
             this.CaliculateAllFramesB.UseVisualStyleBackColor = true;
             this.CaliculateAllFramesB.Click += new System.EventHandler(this.CaliculateAllFramesB_Click);
             // 
             // SaveToCSVB
             // 
-            this.SaveToCSVB.Location = new System.Drawing.Point(1178, 639);
+            this.SaveToCSVB.Location = new System.Drawing.Point(1675, 761);
+            this.SaveToCSVB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.SaveToCSVB.Name = "SaveToCSVB";
-            this.SaveToCSVB.Size = new System.Drawing.Size(100, 52);
+            this.SaveToCSVB.Size = new System.Drawing.Size(236, 91);
             this.SaveToCSVB.TabIndex = 14;
-            this.SaveToCSVB.Text = "結果保存";
+            this.SaveToCSVB.Text = "６．結果保存";
             this.SaveToCSVB.UseVisualStyleBackColor = true;
             this.SaveToCSVB.Click += new System.EventHandler(this.SaveToCSVB_Click);
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(644, 567);
+            this.progressBar.Location = new System.Drawing.Point(1352, 674);
+            this.progressBar.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(276, 40);
+            this.progressBar.Size = new System.Drawing.Size(559, 62);
             this.progressBar.TabIndex = 15;
             // 
             // FrameBox
             // 
-            this.FrameBox.Location = new System.Drawing.Point(739, 612);
-            this.FrameBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FrameBox.Location = new System.Drawing.Point(1034, 534);
             this.FrameBox.Name = "FrameBox";
-            this.FrameBox.Size = new System.Drawing.Size(104, 20);
+            this.FrameBox.Size = new System.Drawing.Size(148, 26);
             this.FrameBox.TabIndex = 16;
-            // 
-            // HealthText
-            // 
-            this.HealthText.Location = new System.Drawing.Point(853, 612);
-            this.HealthText.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.HealthText.Name = "HealthText";
-            this.HealthText.Size = new System.Drawing.Size(68, 20);
-            this.HealthText.TabIndex = 17;
             // 
             // timerFramePlay
             // 
@@ -256,68 +153,79 @@
             // 
             // btnPlay
             // 
-            this.btnPlay.Location = new System.Drawing.Point(431, 596);
-            this.btnPlay.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnPlay.Location = new System.Drawing.Point(1188, 503);
             this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(177, 37);
+            this.btnPlay.Size = new System.Drawing.Size(266, 57);
             this.btnPlay.TabIndex = 18;
             this.btnPlay.Text = "再生";
             this.btnPlay.UseVisualStyleBackColor = true;
             this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
             // 
-            // pictureBoxBW
+            // listBox
             // 
-            this.pictureBoxBW.Location = new System.Drawing.Point(644, 393);
-            this.pictureBoxBW.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.pictureBoxBW.Name = "pictureBoxBW";
-            this.pictureBoxBW.Size = new System.Drawing.Size(48, 31);
-            this.pictureBoxBW.TabIndex = 8;
-            this.pictureBoxBW.TabStop = false;
-            this.pictureBoxBW.Click += new System.EventHandler(this.pictureBoxBW_Click);
+            this.listBox.FormattingEnabled = true;
+            this.listBox.ItemHeight = 20;
+            this.listBox.Location = new System.Drawing.Point(6, 508);
+            this.listBox.Name = "listBox";
+            this.listBox.Size = new System.Drawing.Size(682, 344);
+            this.listBox.TabIndex = 20;
             // 
-            // textBoxError
+            // buttonSF5
             // 
-            this.textBoxError.Location = new System.Drawing.Point(508, 639);
-            this.textBoxError.Name = "textBoxError";
-            this.textBoxError.Size = new System.Drawing.Size(131, 20);
-            this.textBoxError.TabIndex = 19;
+            this.buttonSF5.Location = new System.Drawing.Point(695, 645);
+            this.buttonSF5.Name = "buttonSF5";
+            this.buttonSF5.Size = new System.Drawing.Size(333, 91);
+            this.buttonSF5.TabIndex = 21;
+            this.buttonSF5.Text = "２．SF5用設定";
+            this.buttonSF5.UseVisualStyleBackColor = true;
+            this.buttonSF5.Click += new System.EventHandler(this.buttonSF5_Click);
+            // 
+            // buttonSF6
+            // 
+            this.buttonSF6.Location = new System.Drawing.Point(695, 761);
+            this.buttonSF6.Name = "buttonSF6";
+            this.buttonSF6.Size = new System.Drawing.Size(333, 91);
+            this.buttonSF6.TabIndex = 22;
+            this.buttonSF6.Text = "２．SF6用設定";
+            this.buttonSF6.UseVisualStyleBackColor = true;
+            this.buttonSF6.Click += new System.EventHandler(this.buttonSF6_Click);
+            // 
+            // buttonClear
+            // 
+            this.buttonClear.Location = new System.Drawing.Point(545, 797);
+            this.buttonClear.Name = "buttonClear";
+            this.buttonClear.Size = new System.Drawing.Size(143, 55);
+            this.buttonClear.TabIndex = 23;
+            this.buttonClear.Text = "ClearMessage";
+            this.buttonClear.UseVisualStyleBackColor = true;
+            this.buttonClear.Click += new System.EventHandler(this.buttonClear_Click);
             // 
             // HPBarForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1283, 736);
-            this.Controls.Add(this.textBoxError);
+            this.ClientSize = new System.Drawing.Size(1924, 870);
+            this.Controls.Add(this.buttonClear);
+            this.Controls.Add(this.buttonSF6);
+            this.Controls.Add(this.buttonSF5);
+            this.Controls.Add(this.listBox);
             this.Controls.Add(this.btnPlay);
-            this.Controls.Add(this.HealthText);
             this.Controls.Add(this.FrameBox);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.SaveToCSVB);
             this.Controls.Add(this.CaliculateAllFramesB);
-            this.Controls.Add(this.SetBaseBoundaryB);
-            this.Controls.Add(this.chartG);
-            this.Controls.Add(this.chartDataGray);
-            this.Controls.Add(this.chartData);
-            this.Controls.Add(this.pictureBoxBW);
             this.Controls.Add(this.pictureBoxHP);
-            this.Controls.Add(this.BrightText);
             this.Controls.Add(this.trackBarFrame);
             this.Controls.Add(this.pictureBoxFrame);
             this.Controls.Add(this.AnalyzeB);
             this.Controls.Add(this.ConfigB);
-            this.Controls.Add(this.FileDisplay);
             this.Controls.Add(this.FileSelectB);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "HPBarForm";
             this.Text = "体力ゲージ記録";
             this.Load += new System.EventHandler(this.HPBar_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartData)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartDataGray)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartG)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBW)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -326,26 +234,21 @@
         #endregion
 
         public System.Windows.Forms.Button FileSelectB;
-        public System.Windows.Forms.TextBox FileDisplay;
         public System.Windows.Forms.Button AnalyzeB;
         public System.Windows.Forms.PictureBox pictureBoxFrame;
         public System.Windows.Forms.TrackBar trackBarFrame;
         public System.Windows.Forms.Button ConfigB;
-        public System.Windows.Forms.TextBox BrightText;
-        public System.Windows.Forms.DataVisualization.Charting.Chart chartData;
-        public System.Windows.Forms.DataVisualization.Charting.Chart chartDataGray;
         public System.Windows.Forms.PictureBox pictureBoxHP;
-        public System.Windows.Forms.DataVisualization.Charting.Chart chartG;
-        private System.Windows.Forms.Button SetBaseBoundaryB;
         private System.Windows.Forms.Button CaliculateAllFramesB;
         private System.Windows.Forms.Button SaveToCSVB;
         private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.TextBox FrameBox;
-        private System.Windows.Forms.TextBox HealthText;
         private System.Windows.Forms.Timer timerFramePlay;
         private System.Windows.Forms.Button btnPlay;
-        public System.Windows.Forms.PictureBox pictureBoxBW;
-        private System.Windows.Forms.TextBox textBoxError;
+        private System.Windows.Forms.ListBox listBox;
+        private System.Windows.Forms.Button buttonSF5;
+        private System.Windows.Forms.Button buttonSF6;
+        private System.Windows.Forms.Button buttonClear;
     }
 }
 

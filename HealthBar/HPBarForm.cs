@@ -25,12 +25,11 @@ namespace HealthBar {
         public List<byte> brightnessValues = new List<byte>();
         public (List<byte>, List<byte>, List<byte>) rgbValues = (new List<byte>(), new List<byte>(), new List<byte>());
         public VideoLoader videoL;
-        public Charts charts;
         public Caliculate caliculate;
         public Boundary boundary;
         //chartのON/OFF機能
         readonly bool chartOn = true;
-        public bool SF5 = true;
+        public bool SF5 = false;
         public int SF5selectY = 62;
 
         public CancellationTokenSource cancellationTokenSource;
@@ -40,17 +39,9 @@ namespace HealthBar {
         public HPBarForm() {
             InitializeComponent();
             videoL = new VideoLoader(this);
-            charts = new Charts(this);
             boundary = new Boundary(this);
             caliculate = new Caliculate(this);
 
-
-            //ファイルパス表示or非表示
-            FileDisplay.Visible = false;
-            pictureBoxBW.Visible = false;
-            chartDataGray.Visible = false;
-            //chartData.Visible = false;
-            //chartG.Visible = false;
 
 
 
@@ -63,6 +54,7 @@ namespace HealthBar {
             trackBarFrame.Scroll += TrackBarFrame_Scroll;
             //再生ボタンbtnPlayの表示
             btnPlay.Text = "動画がロードされていません";
+            listBox.Items.Clear();
         }
 
 
@@ -74,8 +66,7 @@ namespace HealthBar {
             FileSelector fileS = new FileSelector();
             filePath = fileS.SelectVideoFile();
 
-            //テキストボックスにファイルパスを表示
-            FileDisplay.Text = filePath;
+
 
             //動画ファイルを開く
             if (!string.IsNullOrEmpty(filePath) && videoL.LoadVideo(filePath)) {
@@ -90,7 +81,9 @@ namespace HealthBar {
                     trackBarFrame.SmallChange = 1; // 矢印キーやクリックで1フレーム進む
                     trackBarFrame.LargeChange = 1; // ページアップ・ダウンで1フレーム進む
                     btnPlay.Text = "再生/停止";
-
+                    //テキストボックスにファイルパスを表示
+                    listBox.Items.Add($"読み込まれたファイルパス:{filePath}");
+                    listBox.Items.Add($"次に解析対象を指定してください。指定なければSF6用の解析です。");
                 } else {
                     MessageBox.Show("フレーム取得失敗", "error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -101,8 +94,7 @@ namespace HealthBar {
 
         public void ConfigB_Click(object sender, EventArgs e) {
             pictureBoxFrame.MouseClick += PictureBoxFrame_MouseClick;
-            pictureBoxBW.MouseClick += PictureBoxBW_MouseClick;
-
+            listBox.Items.Add($"座標指定がアクティブになりました。");
         }
         public void PictureBoxFrame_MouseClick(object sender, MouseEventArgs e) {
             //クリックされたY座標の取得
@@ -110,7 +102,6 @@ namespace HealthBar {
             if (SF5) {
                 selectedY = SF5selectY;
             }
-            BrightText.Text = selectedY.ToString();
 
             //境界線を探す
             gradients = caliculate.Gradient1(trackBarFrame.Value, selectedY);
@@ -119,7 +110,6 @@ namespace HealthBar {
                 boundaries = boundary.FindBoundarySF5(trackBarFrame.Value,selectedY);
                 Console.WriteLine(boundary.ToString());
             }
-            //string boundariesString = string.Join(", ", boundaries);
 
             //境界点を描写したい
             boundaryPoints.Clear();
@@ -127,21 +117,7 @@ namespace HealthBar {
                 boundaryPoints.Add(new System.Drawing.Point(x, selectedY));
             }
             pictureBoxFrame.Refresh();
-            //MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            if (chartOn) {
-                //RGB値を出してみる
-                rgbValues = caliculate.GetRGB(trackBarFrame.Value, selectedY);
-                charts.DrawChartRGB(rgbValues);
-
-                //輝度を出してみる
-                //brightnessValues = caliculate.GetBright(trackBarFrame.Value, selectedY);
-                //charts.DrawChart(brightnessValues);
-
-                //隣のピクセルとの差分を見てみる
-
-                charts.DrawChartGradient(gradients);
-            }
+            listBox.Items.Add($"Y:{selectedY},X:{boundaries[0]},{boundaries[1]},{boundaries[2]},{boundaries[3]}");
         }
         public void PictureBoxFrame_Paint(object sender, PaintEventArgs e) {
             Graphics g = e.Graphics;
@@ -174,7 +150,6 @@ namespace HealthBar {
             int barY = pictureBoxFrame.Height - 300;
             
             // 横棒の背景を描画
-
             // 現在のフレームの体力割合に応じたバーを描画
             int currentFrameIndex = trackBarFrame.Value;
             if (currentFrameIndex < healthPercents1P.Count) {
@@ -191,14 +166,10 @@ namespace HealthBar {
                 //2P
 
                 g.FillRectangle(Brushes.Green, boundary.minHPBoundary2P, barY, (boundary.maxHPBoundary2P - boundary.minHPBoundary2P), barHeight);
-                // 体力割合を示すバーを描画（灰色で削るスタイル）
+                // 体力割合を示すバーを描画
                 g.FillRectangle(Brushes.Gray, boundary.maxHPBoundary1P, barY, barWidth1P, barHeight);
                 //2P
                 g.FillRectangle(Brushes.Gray, boundary.minHPBoundary2P, barY, barWidth2P, barHeight);
-                // 体力%をテキストで表示
-                string percentText = $"{hpPercent1P:F1}%,{hpPercent2P:F1}%";
-                HealthText.Text = percentText;
-                textBoxError.Text = errorList[(currentFrameIndex)];
             }
 
         }
@@ -208,11 +179,6 @@ namespace HealthBar {
 
         public void PictureBoxBW_MouseClick(object sender, MouseEventArgs e) {
             selectedY = e.Y;
-
-            //// クリックされたY座標の輝度値を全て取得
-            //List<byte> brightnessValues = caliculate.GetBright(trackBarFrame.Value, selectedY);
-            //charts.DrawChart(brightnessValues);
-
         }
 
 
@@ -225,11 +191,10 @@ namespace HealthBar {
         public void AnalyzeB_Click(object sender, EventArgs e) {
             string boundariesString = string.Join(", ", boundaries);
             MessageBox.Show(boundariesString, "Boundaries", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            boundary.SetBaseBoundaries(boundaries);
+            listBox.Items.Add($"解析開始を押すと解析が開始されます。");
         }
 
-        public void SetBaseBoundaryB_Click(object sender, EventArgs e) {
-            boundary.SetBaseBoundaries(boundaries);
-        }
 
         public async void CaliculateAllFramesB_Click(object sender, EventArgs e) {
             var progress = new Progress<int>(percent => this.progressBar.Value = percent);
@@ -246,33 +211,11 @@ namespace HealthBar {
                 boundary.SaveHPPercentagesToCSV(saveFileDialog.FileName);
             }
         }
-        public void pictureBoxBW_Click(object sender, EventArgs e) {
-
-        }
-
-        public void chartDataGray_Click(object sender, EventArgs e) {
-
-        }
-
-        public void PictureBoxFrame_MouseDown(object sender, MouseEventArgs e) {
-
-        }
-
-        public void TextBox1_TextChanged(object sender, EventArgs e) {
-
-        }
-
-        public void FileDisplay_TextChanged(object sender, EventArgs e) {
-
-        }
 
         private void pictureBoxFrame_Click(object sender, EventArgs e) {
 
         }
 
-        private void label1_Click(object sender, EventArgs e) {
-
-        }
 
         private void btnPlay_Click(object sender, EventArgs e) {
             if (timerFramePlay.Enabled) {
@@ -295,6 +238,22 @@ namespace HealthBar {
 
         private void trackBarFrame_ValueChanged(object sender, EventArgs e) {
             FrameBox.Text = (videoL.currentframe.ToString());
+        }
+
+        private void buttonSF5_Click(object sender, EventArgs e) {
+            SF5 = true;
+            listBox.Items.Add($"SF5用の解析に切り替わりました。");
+            listBox.Items.Add($"SF5の取得座標は固定ですが、座標設定を押して、適当なフレームで画面をクリックしてください。");
+        }
+
+        private void buttonSF6_Click(object sender, EventArgs e) {
+            SF5 = false;
+            listBox.Items.Add($"SF5用の解析に切り替わりました。");
+            listBox.Items.Add($"座標設定を押して、適当なフレームで画面をクリックしてください。");
+        }
+
+        private void buttonClear_Click(object sender, EventArgs e) {
+            listBox.Items.Clear();
         }
     }
 }
