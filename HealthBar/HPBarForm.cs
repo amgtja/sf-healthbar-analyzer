@@ -30,6 +30,8 @@ namespace HealthBar {
         public Boundary boundary;
         //chartのON/OFF機能
         readonly bool chartOn = true;
+        public bool SF5 = true;
+        public int SF5selectY = 62;
 
         public CancellationTokenSource cancellationTokenSource;
 
@@ -78,7 +80,8 @@ namespace HealthBar {
             //動画ファイルを開く
             if (!string.IsNullOrEmpty(filePath) && videoL.LoadVideo(filePath)) {
                 //最初のフレームを取得
-                Bitmap frame = videoL.GetFrameRead(1);
+                Bitmap frame = videoL.GetFrameRead(0);
+                FrameBox.Text = 0.ToString();
                 if (frame != null) {
                     pictureBoxFrame.Image = frame;
                     //trackBarFrameのMax設定
@@ -104,11 +107,18 @@ namespace HealthBar {
         public void PictureBoxFrame_MouseClick(object sender, MouseEventArgs e) {
             //クリックされたY座標の取得
             selectedY = e.Y;
+            if (SF5) {
+                selectedY = SF5selectY;
+            }
             BrightText.Text = selectedY.ToString();
 
             //境界線を探す
             gradients = caliculate.Gradient1(trackBarFrame.Value, selectedY);
             boundaries = boundary.FindBoundary(gradients);
+            if (SF5) {
+                boundaries = boundary.FindBoundarySF5(trackBarFrame.Value,selectedY);
+                Console.WriteLine(boundary.ToString());
+            }
             //string boundariesString = string.Join(", ", boundaries);
 
             //境界点を描写したい
@@ -161,8 +171,8 @@ namespace HealthBar {
 
             // 描画のためのバーの高さと位置を設定
             int barHeight = 20;
-            int barY = pictureBoxFrame.Height - 500;
-
+            int barY = pictureBoxFrame.Height - 300;
+            
             // 横棒の背景を描画
 
             // 現在のフレームの体力割合に応じたバーを描画
@@ -186,7 +196,7 @@ namespace HealthBar {
                 //2P
                 g.FillRectangle(Brushes.Gray, boundary.minHPBoundary2P, barY, barWidth2P, barHeight);
                 // 体力%をテキストで表示
-                string percentText = $"{hpPercent1P:F1}%,+{","}+{hpPercent2P:F1}%";
+                string percentText = $"{hpPercent1P:F1}%,{hpPercent2P:F1}%";
                 HealthText.Text = percentText;
                 textBoxError.Text = errorList[(currentFrameIndex)];
             }

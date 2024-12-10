@@ -16,6 +16,7 @@ namespace HealthBar {
         public int maxHPBoundary1P = 0;
         public int minHPBoundary1P = 0;
         public int threshold = 30;
+        public int thresholdSF5 = 40;
         public int tempBoundary1P = 0;
         public int maxHPBoundary2P = 0;
         public int minHPBoundary2P = 0;
@@ -31,6 +32,7 @@ namespace HealthBar {
         public Boundary(HPBarForm form) {
             this.form = form;
         }
+        //--------------------------------------------Street Fighter6--------------------------------------------
         public List<int> FindBoundary(List<int> gradient) {
             List<int> boundaries = new List<int>();
             int temp = 0;
@@ -85,7 +87,7 @@ namespace HealthBar {
             // 1P通常バー
             if (r >= 100 && r <= 250 && g <= 50 && b >= 30 && b <= 150 && r >= b && b >= g) return "1PBar";
             // 2P通常バー
-            if (g<=220&&g >= 50 && b >= 100 && b >= g && g >= r) return "2PBar";
+            if (g <= 220 && g >= 50 && b >= 100 && b >= g && g >= r) return "2PBar";
             // ノイズ
             return "noize";
         }
@@ -165,7 +167,7 @@ namespace HealthBar {
                     tempBoundary2P = minHPBoundary2P;
                     Console.WriteLine($"2PLostHP");
                 }
-                temp2P =tempBoundary2P;
+                temp2P = tempBoundary2P;
                 frame.Dispose();
                 frameBitmap.Dispose();
             } catch (Exception ex) {
@@ -201,8 +203,11 @@ namespace HealthBar {
                 for (int i = 0; i < form.videoL.TotalFrames; i++) {
                     //今のBoundaryをcurrentBoundaryとして表示
                     //フレーム番号iにおける画像のGradientを出し、それで計算を行う
-
-                    AnalyzeBoundary1Pand2P(i, form.selectedY);
+                    if (form.SF5) {
+                        AnalyzeBoundarySF5(i, form.selectedY);
+                    } else {
+                        AnalyzeBoundary1Pand2P(i, form.selectedY);
+                    }
                     currentBoundary1P = tempBoundary1P;
                     currentBoundary2P = tempBoundary2P;
 
@@ -228,7 +233,7 @@ namespace HealthBar {
                             form.errorList.Add("1");
                         } else if (gradientCount2P > thresholdGradient) { form.errorList.Add("2"); } else { form.errorList.Add("0"); }
                     }
-                    Console.WriteLine($"Frame{i},{gradientCount1P},{gradientCount2P}");
+                    Console.WriteLine($"Frame{i},{gradientCount1P},{gradientCount2P},x1P{tempBoundary1P},2P{tempBoundary2P}");
                     //進捗報告
                     progress.Report((i + 1) * 100 / form.videoL.TotalFrames);
                 }
@@ -236,16 +241,7 @@ namespace HealthBar {
             MessageBox.Show("全フレームの体力割合の計算が完了しました。", "計算完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
             form.UpdateHPDisplay();
         }
-        public void SaveHPPercentagesToCSV(string outputPath) {
-            using (StreamWriter sw = new StreamWriter(outputPath)) {
-                sw.WriteLine("FrameNumber,LeftHP[%],RightHP[%],ErrorInformation");
-                for (int i = 0; i < form.healthPercents1P.Count; i++) {
-                    sw.WriteLine($"{i},{form.healthPercents1P[i]},{form.healthPercents2P[i]},{form.errorList[i]}");
-                }
-            }
 
-            MessageBox.Show("体力割合をCSVに保存しました。", "保存完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
         public bool CheckKOandHPmin(int y, Mat frame, int minHPBoundary, int offset) {
             bool allInRange = false;
             Vec3b color;
@@ -275,5 +271,204 @@ namespace HealthBar {
             }
             return allInRange;
         }
+        //--------------------------------------------ここまでStreet Fighter6--------------------------------------------
+        //--------------------------------------------ここからStreet Fighter5--------------------------------------------
+        public List<int> FindBoundarySF5(int currentFrame, int y) {
+            Bitmap frameBitmap = form.videoL.GetFrameRead(currentFrame);
+            Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(frameBitmap);
+            List<int> boundaries = new List<int>();
+            Vec3b color;
+            //1P側
+            for (int x = 200; x > 0; x--) {
+                color = frame.At<Vec3b>(y, x);
+                if (color.Item2 < 150) {
+                    boundaries.Add(x + 1);
+                    break;
+                }
+                Console.WriteLine(x.ToString());
+            }
+            for (int x = 200; x < 700; x++) {
+                color = frame.At<Vec3b>(y, x);
+                if (color.Item2 < 150) {
+                    boundaries.Add(x - 1);
+                    break;
+                }
+            }
+            //2P側
+            for (int x = 800; x > 0; x--) {
+                color = frame.At<Vec3b>(y, x);
+                if (color.Item2 < 150) {
+                    boundaries.Add(x + 1);
+                    break;
+                }
+            }
+            for (int x = 800; x < 1200; x++) {
+                color = frame.At<Vec3b>(y, x);
+                if (color.Item2 < 150) {
+                    boundaries.Add(x - 1);
+                    break;
+                }
+            }
+            frame.Dispose();
+            frameBitmap.Dispose();
+            return boundaries;
+        }
+        public string DetectBarStateSF5(Vec3b color) {
+            int r = color.Item2, g = color.Item1, b = color.Item0;
+            //黄色バー
+            if (r > 200 && g > 170 && b > 70 && b < 200) return "YellowBar";
+            if (r > 180 && g > 150 && b > 70 && b < 220) return "YellowBar";
+            // 体力があったとされるところ
+            if (r <= 100 && g <= 100 && b <= 100 && Math.Abs(r - g) <= 50) return "NoHealth";
+            // 通常バー
+            if (r > 50 && g > 180 && b < 200) return "PlayerBar";
+            //通常バー２
+            if (r > 150 && g > 100 && g < 220 && b > 80 && b < 150) return "PlayerBar";
+            //通常バー３、GreenEdge
+            if (r < 100 && g > 220 && b > 70 && b < 120) return "PlayerBar";
+            // Damageと通常バーの境目
+            if (r > 200 && g < 120 && b < 100) return "PlayerDamagedLine";
+            // ダメージバー
+            if (r >= 100 && g <= 100 && b <= 100) return "Damage";
+            // 削れているところ
+            if (r >= 100 && g >= 100 && b >= 100 && r <= 150 && g <= 150 && b <= 150 && Math.Abs(r - g) <= 50 && Math.Abs(b - g) <= 50) return "TempDamage";
+            //最初らへんのバーのところ
+            if (Math.Abs(r - g) < 20 && Math.Abs(g - b) < 20) return "Edge";
+            // ノイズ
+            return "noize";
+        }
+
+        public void AnalyzeBoundarySF5(int currentFrame, int y) {
+            Bitmap frameBitmap = form.videoL.GetFrameRead(currentFrame);
+            Mat frame = OpenCvSharp.Extensions.BitmapConverter.ToMat(frameBitmap);
+            try {
+                //Gradientと同じ操作を行う
+                Vec3b color;
+                int prevIntensity = -threshold;
+                int intensity;
+                int gradient;
+                gradientCount1P = 0;
+                if (temp1P == 0) {
+                    temp1P = maxHPBoundary1P - 1;
+                }
+                for (int x = maxHPBoundary1P; x < minHPBoundary1P - 2; x++) {
+                    color = frame.At<Vec3b>(y, x);
+                    intensity = color.Item0 + color.Item1 + color.Item2;
+                    gradient = Math.Abs(intensity - prevIntensity);
+                    if (gradient > threshold) {
+                        Console.WriteLine($"1Pthreshold{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
+                    }
+                    if (DetectBarStateSF5(color) == "YellowBar" && maxHPBoundary1P == x - 1) {
+                        //体力100%
+                        tempBoundary1P = x - 1;
+                        Console.WriteLine($"MAX1PBar{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
+                    } else if (gradient > thresholdSF5 && Math.Abs(temp1P - x) > (minHPBoundary1P - maxHPBoundary1P) / 2 && x > temp1P) {
+                        gradientCount1P = 5;
+                        Console.WriteLine($"1PRapid HPdown{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
+                    } else if (gradient > thresholdSF5 && (DetectBarStateSF5(color) == "PlayerBar" || DetectBarStateSF5(color) == "PlayerDamagedLine" || DetectBarStateSF5(color) == "YellowBar")) {
+                        tempBoundary1P = x - 1;
+                        Console.WriteLine($"1PBar{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
+                    } else if (gradient < thresholdSF5 && DetectBarStateSF5(color) == "YellowBar") {
+                        //Console.WriteLine($"1PYellowBar{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P}");
+                    } else if (DetectBarStateSF5(color) == "noize" && x > temp1P) {
+                        Console.WriteLine($"Noize{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
+                        gradientCount1P++;
+                    } else if (gradient > thresholdSF5 && DetectBarStateSF5(color) == "NoHealth" && x > temp1P) {
+                        Console.WriteLine($"NoizeNoHealth1P{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
+                        gradientCount1P++;
+                    }
+                    prevIntensity = intensity;
+                }
+                color = frame.At<Vec3b>(y, minHPBoundary1P);
+                intensity = color.Item0 + color.Item1 + color.Item2;
+                Console.WriteLine($"1Pfinal{currentFrame},x{minHPBoundary1P},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
+                if (Math.Abs(minHPBoundary1P  + maxHPBoundary1P * 3) / 4 < temp1P && tempBoundary1P < Math.Abs(minHPBoundary1P*3 + maxHPBoundary1P ) / 4) {
+                    tempBoundary1P = minHPBoundary1P;
+                } 
+                if (gradientCount2P >= thresholdGradient) {
+                    tempBoundary2P = temp2P;
+
+                }
+                if (gradientCount1P > thresholdGradient) {
+                    tempBoundary1P = temp1P;
+                }
+                temp1P = tempBoundary1P;
+                //2P
+                prevIntensity = -threshold;
+                if (temp2P == 0) {
+                    temp2P = maxHPBoundary2P + 1;
+                }
+                gradientCount2P = 0;
+                for (int x = maxHPBoundary2P; x > minHPBoundary2P + 2; x--) {
+                    color = frame.At<Vec3b>(y, x);
+                    intensity = color.Item0 + color.Item1 + color.Item2;
+                    gradient = Math.Abs(intensity - prevIntensity);
+                    if (gradient > threshold) {
+                        Console.WriteLine($"2Pthreshold{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
+                    }
+                    if (DetectBarStateSF5(color) == "YellowBar" && maxHPBoundary2P == x + 1) {
+                        //体力100%
+                        tempBoundary2P = x + 1;
+                        Console.WriteLine($"MAX2PBar{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
+                    } else if (gradient > thresholdSF5 && Math.Abs(temp2P - x) > (maxHPBoundary2P - minHPBoundary2P) / 2 && x < temp2P) {
+                        gradientCount2P = 5;
+                        Console.WriteLine($"2PRapid HPdown{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
+                    } else if (gradient < thresholdSF5 && DetectBarStateSF5(color) == "YellowBar") {
+                        //Console.WriteLine($"2PYellowBar{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P}");
+                    } else if (gradient > thresholdSF5 && (DetectBarStateSF5(color) == "PlayerBar" || DetectBarStateSF5(color) == "PlayerDamagedLine" || DetectBarStateSF5(color) == "YellowBar")) {
+                        tempBoundary2P = x + 1;
+                        Console.WriteLine($"2PBar{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
+                    } else if (DetectBarStateSF5(color) == "noize" && x < temp2P) {
+                        Console.WriteLine($"Noize{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
+                        gradientCount2P++;
+                    } else if (gradient > thresholdSF5 && DetectBarStateSF5(color) == "NoHealth" && x < temp2P) {
+                        Console.WriteLine($"NoizeNoHealth2P{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
+                        gradientCount2P++;
+                    }
+                    prevIntensity = intensity;
+                }
+                color = frame.At<Vec3b>(y, minHPBoundary2P);
+                intensity = color.Item0 + color.Item1 + color.Item2;
+                Console.WriteLine($"2Pfinal{currentFrame},x{minHPBoundary2P},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
+                if (Math.Abs(minHPBoundary2P * 3 + maxHPBoundary2P) / 4 > temp2P && tempBoundary2P > Math.Abs(minHPBoundary2P + maxHPBoundary2P * 3) / 4) {
+                    tempBoundary2P = minHPBoundary2P;
+                    Console.WriteLine($"minMax{Math.Abs(minHPBoundary2P * 3 + maxHPBoundary2P) / 4},temp2P{temp2P},{Math.Abs(minHPBoundary2P + maxHPBoundary2P * 3) / 4}");
+                } 
+                if (gradientCount2P >= thresholdGradient) {
+                    tempBoundary2P = temp2P;
+
+                }
+                temp2P = tempBoundary2P;
+                frame.Dispose();
+                frameBitmap.Dispose();
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                frame.Dispose();
+                frameBitmap.Dispose();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+        //--------------------------------------------ここまでStreet Fighter5--------------------------------------------
+        //--------------------------------------------ここから共通事項--------------------------------------------
+        public void SaveHPPercentagesToCSV(string outputPath) {
+            using (StreamWriter sw = new StreamWriter(outputPath)) {
+                sw.WriteLine("FrameNumber,LeftHP[%],RightHP[%],ErrorInformation");
+                for (int i = 0; i < form.healthPercents1P.Count; i++) {
+                    sw.WriteLine($"{i},{form.healthPercents1P[i]},{form.healthPercents2P[i]},{form.errorList[i]}");
+                }
+            }
+
+            MessageBox.Show("体力割合をCSVに保存しました。", "保存完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
     }
 }
