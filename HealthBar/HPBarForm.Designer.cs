@@ -45,6 +45,7 @@
             this.buttonSF5 = new System.Windows.Forms.Button();
             this.buttonSF6 = new System.Windows.Forms.Button();
             this.buttonClear = new System.Windows.Forms.Button();
+            this.ConfigManualB = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxHP)).BeginInit();
@@ -52,50 +53,49 @@
             // 
             // FileSelectB
             // 
-            this.FileSelectB.Location = new System.Drawing.Point(695, 503);
+            this.FileSelectB.Location = new System.Drawing.Point(463, 302);
+            this.FileSelectB.Margin = new System.Windows.Forms.Padding(2);
             this.FileSelectB.Name = "FileSelectB";
-            this.FileSelectB.Size = new System.Drawing.Size(333, 58);
+            this.FileSelectB.Size = new System.Drawing.Size(222, 35);
             this.FileSelectB.TabIndex = 0;
-            this.FileSelectB.Text = "１．ファイル選択ボタン";
+            this.FileSelectB.Text = "１．ファイル選択";
             this.FileSelectB.UseVisualStyleBackColor = true;
             this.FileSelectB.Click += new System.EventHandler(this.FileSelectB_Click);
             // 
             // AnalyzeB
             // 
-            this.AnalyzeB.Location = new System.Drawing.Point(1080, 761);
-            this.AnalyzeB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.AnalyzeB.Location = new System.Drawing.Point(576, 455);
             this.AnalyzeB.Name = "AnalyzeB";
-            this.AnalyzeB.Size = new System.Drawing.Size(246, 91);
+            this.AnalyzeB.Size = new System.Drawing.Size(134, 55);
             this.AnalyzeB.TabIndex = 3;
-            this.AnalyzeB.Text = "４．解析設定読み込みボタン";
+            this.AnalyzeB.Text = "４．解析設定読み込み";
             this.AnalyzeB.UseVisualStyleBackColor = true;
             this.AnalyzeB.Click += new System.EventHandler(this.AnalyzeB_Click);
             // 
             // pictureBoxFrame
             // 
-            this.pictureBoxFrame.Location = new System.Drawing.Point(6, 2);
-            this.pictureBoxFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.pictureBoxFrame.Location = new System.Drawing.Point(4, 1);
             this.pictureBoxFrame.Name = "pictureBoxFrame";
-            this.pictureBoxFrame.Size = new System.Drawing.Size(1920, 492);
+            this.pictureBoxFrame.Size = new System.Drawing.Size(1280, 295);
             this.pictureBoxFrame.TabIndex = 4;
             this.pictureBoxFrame.TabStop = false;
             this.pictureBoxFrame.Click += new System.EventHandler(this.pictureBoxFrame_Click);
             // 
             // trackBarFrame
             // 
-            this.trackBarFrame.Location = new System.Drawing.Point(695, 568);
-            this.trackBarFrame.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.trackBarFrame.Location = new System.Drawing.Point(463, 341);
             this.trackBarFrame.Name = "trackBarFrame";
-            this.trackBarFrame.Size = new System.Drawing.Size(1231, 69);
+            this.trackBarFrame.Size = new System.Drawing.Size(821, 45);
             this.trackBarFrame.TabIndex = 5;
             this.trackBarFrame.Scroll += new System.EventHandler(this.TrackBarFrame_Scroll);
             this.trackBarFrame.ValueChanged += new System.EventHandler(this.trackBarFrame_ValueChanged);
             // 
             // ConfigB
             // 
-            this.ConfigB.Location = new System.Drawing.Point(1080, 645);
+            this.ConfigB.Location = new System.Drawing.Point(576, 386);
+            this.ConfigB.Margin = new System.Windows.Forms.Padding(2);
             this.ConfigB.Name = "ConfigB";
-            this.ConfigB.Size = new System.Drawing.Size(246, 91);
+            this.ConfigB.Size = new System.Drawing.Size(109, 55);
             this.ConfigB.TabIndex = 2;
             this.ConfigB.Text = "３．座標指定";
             this.ConfigB.UseVisualStyleBackColor = true;
@@ -103,7 +103,8 @@
             // 
             // pictureBoxHP
             // 
-            this.pictureBoxHP.Location = new System.Drawing.Point(-2, 663);
+            this.pictureBoxHP.Location = new System.Drawing.Point(-1, 398);
+            this.pictureBoxHP.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBoxHP.Name = "pictureBoxHP";
             this.pictureBoxHP.Size = new System.Drawing.Size(0, 0);
             this.pictureBoxHP.TabIndex = 7;
@@ -111,10 +112,9 @@
             // 
             // CaliculateAllFramesB
             // 
-            this.CaliculateAllFramesB.Location = new System.Drawing.Point(1352, 761);
-            this.CaliculateAllFramesB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.CaliculateAllFramesB.Location = new System.Drawing.Point(901, 457);
             this.CaliculateAllFramesB.Name = "CaliculateAllFramesB";
-            this.CaliculateAllFramesB.Size = new System.Drawing.Size(236, 91);
+            this.CaliculateAllFramesB.Size = new System.Drawing.Size(94, 55);
             this.CaliculateAllFramesB.TabIndex = 13;
             this.CaliculateAllFramesB.Text = "５．解析開始";
             this.CaliculateAllFramesB.UseVisualStyleBackColor = true;
@@ -122,10 +122,9 @@
             // 
             // SaveToCSVB
             // 
-            this.SaveToCSVB.Location = new System.Drawing.Point(1675, 761);
-            this.SaveToCSVB.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.SaveToCSVB.Location = new System.Drawing.Point(1001, 458);
             this.SaveToCSVB.Name = "SaveToCSVB";
-            this.SaveToCSVB.Size = new System.Drawing.Size(236, 91);
+            this.SaveToCSVB.Size = new System.Drawing.Size(105, 55);
             this.SaveToCSVB.TabIndex = 14;
             this.SaveToCSVB.Text = "６．結果保存";
             this.SaveToCSVB.UseVisualStyleBackColor = true;
@@ -133,17 +132,17 @@
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(1352, 674);
-            this.progressBar.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.progressBar.Location = new System.Drawing.Point(901, 404);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(559, 62);
+            this.progressBar.Size = new System.Drawing.Size(373, 37);
             this.progressBar.TabIndex = 15;
             // 
             // FrameBox
             // 
-            this.FrameBox.Location = new System.Drawing.Point(1034, 534);
+            this.FrameBox.Location = new System.Drawing.Point(689, 320);
+            this.FrameBox.Margin = new System.Windows.Forms.Padding(2);
             this.FrameBox.Name = "FrameBox";
-            this.FrameBox.Size = new System.Drawing.Size(148, 26);
+            this.FrameBox.Size = new System.Drawing.Size(100, 19);
             this.FrameBox.TabIndex = 16;
             // 
             // timerFramePlay
@@ -153,9 +152,10 @@
             // 
             // btnPlay
             // 
-            this.btnPlay.Location = new System.Drawing.Point(1188, 503);
+            this.btnPlay.Location = new System.Drawing.Point(792, 302);
+            this.btnPlay.Margin = new System.Windows.Forms.Padding(2);
             this.btnPlay.Name = "btnPlay";
-            this.btnPlay.Size = new System.Drawing.Size(266, 57);
+            this.btnPlay.Size = new System.Drawing.Size(177, 34);
             this.btnPlay.TabIndex = 18;
             this.btnPlay.Text = "再生";
             this.btnPlay.UseVisualStyleBackColor = true;
@@ -164,17 +164,19 @@
             // listBox
             // 
             this.listBox.FormattingEnabled = true;
-            this.listBox.ItemHeight = 20;
-            this.listBox.Location = new System.Drawing.Point(6, 508);
+            this.listBox.ItemHeight = 12;
+            this.listBox.Location = new System.Drawing.Point(4, 305);
+            this.listBox.Margin = new System.Windows.Forms.Padding(2);
             this.listBox.Name = "listBox";
-            this.listBox.Size = new System.Drawing.Size(682, 344);
+            this.listBox.Size = new System.Drawing.Size(456, 208);
             this.listBox.TabIndex = 20;
             // 
             // buttonSF5
             // 
-            this.buttonSF5.Location = new System.Drawing.Point(695, 645);
+            this.buttonSF5.Location = new System.Drawing.Point(462, 386);
+            this.buttonSF5.Margin = new System.Windows.Forms.Padding(2);
             this.buttonSF5.Name = "buttonSF5";
-            this.buttonSF5.Size = new System.Drawing.Size(333, 91);
+            this.buttonSF5.Size = new System.Drawing.Size(109, 55);
             this.buttonSF5.TabIndex = 21;
             this.buttonSF5.Text = "２．SF5用設定";
             this.buttonSF5.UseVisualStyleBackColor = true;
@@ -182,9 +184,10 @@
             // 
             // buttonSF6
             // 
-            this.buttonSF6.Location = new System.Drawing.Point(695, 761);
+            this.buttonSF6.Location = new System.Drawing.Point(462, 455);
+            this.buttonSF6.Margin = new System.Windows.Forms.Padding(2);
             this.buttonSF6.Name = "buttonSF6";
-            this.buttonSF6.Size = new System.Drawing.Size(333, 91);
+            this.buttonSF6.Size = new System.Drawing.Size(109, 55);
             this.buttonSF6.TabIndex = 22;
             this.buttonSF6.Text = "２．SF6用設定";
             this.buttonSF6.UseVisualStyleBackColor = true;
@@ -192,19 +195,31 @@
             // 
             // buttonClear
             // 
-            this.buttonClear.Location = new System.Drawing.Point(545, 797);
+            this.buttonClear.Location = new System.Drawing.Point(363, 478);
+            this.buttonClear.Margin = new System.Windows.Forms.Padding(2);
             this.buttonClear.Name = "buttonClear";
-            this.buttonClear.Size = new System.Drawing.Size(143, 55);
+            this.buttonClear.Size = new System.Drawing.Size(95, 33);
             this.buttonClear.TabIndex = 23;
             this.buttonClear.Text = "ClearMessage";
             this.buttonClear.UseVisualStyleBackColor = true;
             this.buttonClear.Click += new System.EventHandler(this.buttonClear_Click);
             // 
+            // ConfigManualB
+            // 
+            this.ConfigManualB.Location = new System.Drawing.Point(690, 386);
+            this.ConfigManualB.Name = "ConfigManualB";
+            this.ConfigManualB.Size = new System.Drawing.Size(123, 55);
+            this.ConfigManualB.TabIndex = 24;
+            this.ConfigManualB.Text = "3. 座標指定(手動)";
+            this.ConfigManualB.UseVisualStyleBackColor = true;
+            this.ConfigManualB.Click += new System.EventHandler(this.ConfigManualB_Click);
+            // 
             // HPBarForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1924, 870);
+            this.ClientSize = new System.Drawing.Size(1283, 522);
+            this.Controls.Add(this.ConfigManualB);
             this.Controls.Add(this.buttonClear);
             this.Controls.Add(this.buttonSF6);
             this.Controls.Add(this.buttonSF5);
@@ -220,8 +235,9 @@
             this.Controls.Add(this.AnalyzeB);
             this.Controls.Add(this.ConfigB);
             this.Controls.Add(this.FileSelectB);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "HPBarForm";
-            this.Text = "体力ゲージ記録";
+            this.Text = "eスポーツ体力ゲージ解析プログラム";
             this.Load += new System.EventHandler(this.HPBar_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarFrame)).EndInit();
@@ -249,6 +265,7 @@
         private System.Windows.Forms.Button buttonSF5;
         private System.Windows.Forms.Button buttonSF6;
         private System.Windows.Forms.Button buttonClear;
+        private System.Windows.Forms.Button ConfigManualB;
     }
 }
 

@@ -27,15 +27,15 @@ namespace HealthBar {
         public VideoLoader videoL;
         public Caliculate caliculate;
         public Boundary boundary;
-        //chartのON/OFF機能
-        readonly bool chartOn = true;
         public bool SF5 = false;
         public int SF5selectY = 62;
+        public bool manualSelect = false;
 
         public CancellationTokenSource cancellationTokenSource;
 
         public string filePath = null;
         public int selectedY = 0;
+        public int selectedYfix = 0;
         public HPBarForm() {
             InitializeComponent();
             videoL = new VideoLoader(this);
@@ -72,7 +72,7 @@ namespace HealthBar {
             if (!string.IsNullOrEmpty(filePath) && videoL.LoadVideo(filePath)) {
                 //最初のフレームを取得
                 Bitmap frame = videoL.GetFrameRead(0);
-                FrameBox.Text = 0.ToString();
+                FrameBox.Text = ($"Frame:0");
                 if (frame != null) {
                     pictureBoxFrame.Image = frame;
                     //trackBarFrameのMax設定
@@ -93,32 +93,52 @@ namespace HealthBar {
         }
 
         public void ConfigB_Click(object sender, EventArgs e) {
+            pictureBoxFrame.MouseClick -= PictureBoxFrame_MouseClick;
             pictureBoxFrame.MouseClick += PictureBoxFrame_MouseClick;
-            listBox.Items.Add($"座標指定がアクティブになりました。");
+            listBox.Items.Add($"座標指定がアクティブになりました。体力バーをクリックしてください。");
+            manualSelect = false;
+        }
+        private void ConfigManualB_Click(object sender, EventArgs e) {
+            pictureBoxFrame.MouseClick -= PictureBoxFrame_MouseClick;
+            pictureBoxFrame.MouseClick += PictureBoxFrame_MouseClick;
+            listBox.Items.Add($"手動で座標を４点指定してください。Y座標は初めの１点目で決まります。");
+            manualSelect = true;
+            boundaries.Clear();
         }
         public void PictureBoxFrame_MouseClick(object sender, MouseEventArgs e) {
             //クリックされたY座標の取得
+            if (boundaries.Count == 4) boundaries.Clear();
             selectedY = e.Y;
             if (SF5) {
                 selectedY = SF5selectY;
             }
-
-            //境界線を探す
-            gradients = caliculate.Gradient1(trackBarFrame.Value, selectedY);
-            boundaries = boundary.FindBoundary(gradients);
-            if (SF5) {
-                boundaries = boundary.FindBoundarySF5(trackBarFrame.Value,selectedY);
-                Console.WriteLine(boundary.ToString());
+            if (manualSelect) {
+                boundaries.Add(e.X);
+                if (boundaries.Count == 1) selectedYfix = selectedY;
+                listBox.Items.Add($"Y:{selectedYfix}で固定、X:{boundaries[boundaries.Count - 1]}");
+                if (boundaries.Count == 4) {
+                    selectedY = selectedYfix;
+                    boundaries.Sort();
+                }
+            } else {
+                //境界線を探す
+                gradients = caliculate.Gradient1(trackBarFrame.Value, selectedY);
+                boundaries = boundary.FindBoundary(gradients);
+                if (SF5) {
+                    boundaries = boundary.FindBoundarySF5(trackBarFrame.Value, selectedY);
+                    Console.WriteLine(boundary.ToString());
+                }
             }
-
-            //境界点を描写したい
-            boundaryPoints.Clear();
-            foreach (int x in boundaries) {
-                boundaryPoints.Add(new System.Drawing.Point(x, selectedY));
+            if (boundaries.Count == 4) {
+                boundaryPoints.Clear();
+                foreach (int x in boundaries) {
+                    boundaryPoints.Add(new System.Drawing.Point(x, selectedY));
+                }
+                pictureBoxFrame.Refresh();
+                listBox.Items.Add($"Y:{selectedY},X:{boundaries[0]},{boundaries[1]},{boundaries[2]},{boundaries[3]}");
             }
-            pictureBoxFrame.Refresh();
-            listBox.Items.Add($"Y:{selectedY},X:{boundaries[0]},{boundaries[1]},{boundaries[2]},{boundaries[3]}");
         }
+
         public void PictureBoxFrame_Paint(object sender, PaintEventArgs e) {
             Graphics g = e.Graphics;
             Brush brush = Brushes.Red; // 点の色を指定
@@ -148,28 +168,26 @@ namespace HealthBar {
             // 描画のためのバーの高さと位置を設定
             int barHeight = 20;
             int barY = pictureBoxFrame.Height - 300;
-            
+
             // 横棒の背景を描画
             // 現在のフレームの体力割合に応じたバーを描画
             int currentFrameIndex = trackBarFrame.Value;
             if (currentFrameIndex < healthPercents1P.Count) {
                 double hpPercent1P = healthPercents1P[currentFrameIndex];
                 double hpPercent2P = healthPercents2P[currentFrameIndex];
-                Console.WriteLine($"Frame: {currentFrameIndex}, HP Percent: {hpPercent1P},{hpPercent2P}");
 
                 int maxWidth1P = boundary.minHPBoundary1P - boundary.maxHPBoundary1P;
                 int barWidth1P = (int)(maxWidth1P * (1 - hpPercent1P / 100.0));
                 int maxWidth2P = boundary.maxHPBoundary2P - boundary.minHPBoundary2P;
-                int barWidth2P = (int)(maxWidth2P * (1 - hpPercent2P / 100.0));
+                int barWidth2P = (int)(maxWidth2P * (hpPercent2P / 100.0));
 
                 g.FillRectangle(Brushes.Green, boundary.maxHPBoundary1P, barY, (boundary.minHPBoundary1P - boundary.maxHPBoundary1P), barHeight);
                 //2P
-
-                g.FillRectangle(Brushes.Green, boundary.minHPBoundary2P, barY, (boundary.maxHPBoundary2P - boundary.minHPBoundary2P), barHeight);
+                g.FillRectangle(Brushes.Gray, boundary.minHPBoundary2P, barY, (boundary.maxHPBoundary2P - boundary.minHPBoundary2P), barHeight);
                 // 体力割合を示すバーを描画
                 g.FillRectangle(Brushes.Gray, boundary.maxHPBoundary1P, barY, barWidth1P, barHeight);
                 //2P
-                g.FillRectangle(Brushes.Gray, boundary.minHPBoundary2P, barY, barWidth2P, barHeight);
+                g.FillRectangle(Brushes.Green, boundary.minHPBoundary2P, barY, barWidth2P, barHeight);
             }
 
         }
@@ -184,7 +202,7 @@ namespace HealthBar {
 
         public void TrackBarFrame_Scroll(object sender, EventArgs e) {
             pictureBoxFrame.Image = videoL.GetFrameRead(trackBarFrame.Value);
-            FrameBox.Text = (videoL.currentframe.ToString());
+            FrameBox.Text = ($"Frame:{videoL.currentframe.ToString()}");
         }
 
 
@@ -202,14 +220,13 @@ namespace HealthBar {
         }
 
         public void SaveToCSVB_Click(object sender, EventArgs e) {
-            SaveFileDialog saveFileDialog = new SaveFileDialog {
-                Filter = "CSVファイル (*.csv)|*.csv",
-                Title = "保存先のファイルを指定してください"
-            };
-
-            if (saveFileDialog.ShowDialog() == DialogResult.OK) {
-                boundary.SaveHPPercentagesToCSV(saveFileDialog.FileName);
-            }
+            string directoryPath = Path.GetDirectoryName(filePath);
+            string originalFileName = Path.GetFileNameWithoutExtension(filePath);
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string csvFileName = $"{originalFileName}_{timestamp}.csv";
+            string csvFilePath = Path.Combine(directoryPath, csvFileName);
+            boundary.SaveHPPercentagesToCSV(csvFilePath);
+            listBox.Items.Add($"保存先:{directoryPath},保存名:{csvFileName}");
         }
 
         private void pictureBoxFrame_Click(object sender, EventArgs e) {
@@ -237,23 +254,25 @@ namespace HealthBar {
         }
 
         private void trackBarFrame_ValueChanged(object sender, EventArgs e) {
-            FrameBox.Text = (videoL.currentframe.ToString());
+            FrameBox.Text = ($"Frame:{videoL.currentframe.ToString()}");
         }
 
         private void buttonSF5_Click(object sender, EventArgs e) {
             SF5 = true;
             listBox.Items.Add($"SF5用の解析に切り替わりました。");
-            listBox.Items.Add($"SF5の取得座標は固定ですが、座標設定を押して、適当なフレームで画面をクリックしてください。");
+            listBox.Items.Add($"SF5の取得座標は、Y座標は固定ですが、座標設定を押して、適当なフレームで画面をクリックしてください。");
         }
 
         private void buttonSF6_Click(object sender, EventArgs e) {
             SF5 = false;
-            listBox.Items.Add($"SF5用の解析に切り替わりました。");
+            listBox.Items.Add($"SF6用の解析に切り替わりました。");
             listBox.Items.Add($"座標設定を押して、適当なフレームで画面をクリックしてください。");
         }
 
         private void buttonClear_Click(object sender, EventArgs e) {
             listBox.Items.Clear();
         }
+
+
     }
 }

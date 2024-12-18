@@ -120,7 +120,6 @@ namespace HealthBar {
                 //KOのKの字が見えて、かつ最後のXがNoizeなら自分のHPを0と判定する
                 if (CheckKOandHPmin(y, frame, minHPBoundary1P, -3)) {
                     tempBoundary1P = minHPBoundary1P;
-                    Console.WriteLine($"1PLostHP");
                 }
                 temp1P = tempBoundary1P;
                 //2P
@@ -154,7 +153,6 @@ namespace HealthBar {
                 //KOのKの字が見えて、かつ最後のXがNoizeなら自分のHPを0と判定する
                 if (CheckKOandHPmin(y, frame, minHPBoundary2P, +3)) {
                     tempBoundary2P = minHPBoundary2P;
-                    Console.WriteLine($"2PLostHP");
                 }
                 temp2P = tempBoundary2P;
                 frame.Dispose();
@@ -370,13 +368,9 @@ namespace HealthBar {
                 }
                 color = frame.At<Vec3b>(y, minHPBoundary1P);
                 intensity = color.Item0 + color.Item1 + color.Item2;
-                Console.WriteLine($"1Pfinal{currentFrame},x{minHPBoundary1P},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
-                if (Math.Abs(minHPBoundary1P  + maxHPBoundary1P * 3) / 4 < temp1P && tempBoundary1P < Math.Abs(minHPBoundary1P*3 + maxHPBoundary1P ) / 4) {
+                Console.WriteLine($"1Pfinal{currentFrame},x{minHPBoundary1P},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
+                if (Math.Abs(minHPBoundary1P * 3 + maxHPBoundary1P) / 4 < temp1P && tempBoundary1P < Math.Abs(minHPBoundary1P + maxHPBoundary1P * 3) / 4) {
                     tempBoundary1P = minHPBoundary1P;
-                } 
-                if (gradientCount2P >= thresholdGradient) {
-                    tempBoundary2P = temp2P;
-
                 }
                 if (gradientCount1P > thresholdGradient) {
                     tempBoundary1P = temp1P;
@@ -393,36 +387,28 @@ namespace HealthBar {
                     intensity = color.Item0 + color.Item1 + color.Item2;
                     gradient = Math.Abs(intensity - prevIntensity);
                     if (gradient > threshold) {
-                        Console.WriteLine($"2Pthreshold{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
                     }
                     if (DetectBarStateSF5(color) == "YellowBar" && maxHPBoundary2P == x + 1) {
                         //体力100%
                         tempBoundary2P = x + 1;
-                        Console.WriteLine($"MAX2PBar{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
                     } else if (gradient > thresholdSF5 && Math.Abs(temp2P - x) > (maxHPBoundary2P - minHPBoundary2P) / 2 && x < temp2P) {
                         gradientCount2P = 5;
-                        Console.WriteLine($"2PRapid HPdown{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
                     } else if (gradient < thresholdSF5 && DetectBarStateSF5(color) == "YellowBar") {
                         //Console.WriteLine($"2PYellowBar{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P}");
                     } else if (gradient > thresholdSF5 && (DetectBarStateSF5(color) == "PlayerBar" || DetectBarStateSF5(color) == "PlayerDamagedLine" || DetectBarStateSF5(color) == "YellowBar")) {
                         tempBoundary2P = x + 1;
-                        Console.WriteLine($"2PBar{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
                     } else if (DetectBarStateSF5(color) == "noize" && x < temp2P) {
-                        Console.WriteLine($"Noize{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
                         gradientCount2P++;
                     } else if (gradient > thresholdSF5 && DetectBarStateSF5(color) == "NoHealth" && x < temp2P) {
-                        Console.WriteLine($"NoizeNoHealth2P{currentFrame},x{x},gra{gradient},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp1P},{DetectBarStateSF5(color)}");
                         gradientCount2P++;
                     }
                     prevIntensity = intensity;
                 }
                 color = frame.At<Vec3b>(y, minHPBoundary2P);
                 intensity = color.Item0 + color.Item1 + color.Item2;
-                Console.WriteLine($"2Pfinal{currentFrame},x{minHPBoundary2P},r{color.Item2},g{color.Item1},b{color.Item0},temp{temp2P},{DetectBarStateSF5(color)}");
                 if (Math.Abs(minHPBoundary2P * 3 + maxHPBoundary2P) / 4 > temp2P && tempBoundary2P > Math.Abs(minHPBoundary2P + maxHPBoundary2P * 3) / 4) {
                     tempBoundary2P = minHPBoundary2P;
-                    Console.WriteLine($"minMax{Math.Abs(minHPBoundary2P * 3 + maxHPBoundary2P) / 4},temp2P{temp2P},{Math.Abs(minHPBoundary2P + maxHPBoundary2P * 3) / 4}");
-                } 
+                }
                 if (gradientCount2P >= thresholdGradient) {
                     tempBoundary2P = temp2P;
 
