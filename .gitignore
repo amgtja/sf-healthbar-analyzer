@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# NuGet CLI executable (downloaded locally, not needed in repo)
+nuget.exe
