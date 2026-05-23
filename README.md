@@ -27,7 +27,9 @@
   4. Review the HP timeline or export to CSV
 
   ## Screenshot
-  <img width="1617" height="825" alt="image" src="https://github.com/user-attachments/assets/2137d53a-dcad-4100-8bea-eb1e2927f720" />
+  <img width="1602" height="688" alt="image" src="https://github.com/user-attachments/assets/54c68bbe-ba83-4041-8e0f-21be28ea45a4" />
+  
+
 
 
   ## Setup
