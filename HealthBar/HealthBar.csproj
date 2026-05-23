@@ -73,9 +73,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalysisResult.cs" />
+    <Compile Include="BarColorClassifier.cs" />
     <Compile Include="Boundary.cs" />
-    <Compile Include="Caliculate.cs" />
+    <Compile Include="Calculate.cs" />
     <Compile Include="FileSelector.cs" />
+    <Compile Include="IFrameReader.cs" />
     <Compile Include="HPBarForm.cs">
       <SubType>Form</SubType>
     </Compile>

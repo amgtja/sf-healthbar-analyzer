@@ -1,46 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.DataVisualization.Charting;
-using OpenCvSharp;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace HealthBar {
     public partial class HPBarForm : Form {
-        public List<double> healthPercents1P = new List<double>();
-        public List<double> healthPercents2P = new List<double>();
-        public List<string> errorList = new List<string>();
-        public List<System.Drawing.Point> boundaryPoints = new List<System.Drawing.Point>();
-        public List<int> boundaries = new List<int>();
-        public List<int> gradients = new List<int>();
-        public List<byte> brightnessValues = new List<byte>();
-        public (List<byte>, List<byte>, List<byte>) rgbValues = (new List<byte>(), new List<byte>(), new List<byte>());
-        public VideoLoader videoL;
-        public Caliculate caliculate;
-        public Boundary boundary;
-        public bool SF5 = false;
-        public int SF5selectY = 62;
-        public bool manualSelect = false;
+        private List<double> healthPercents1P = new List<double>();
+        private List<double> healthPercents2P = new List<double>();
+        private List<string> errorList = new List<string>();
+        private AnalysisResult lastAnalysisResult;
+        private List<System.Drawing.Point> boundaryPoints = new List<System.Drawing.Point>();
+        private List<int> boundaries = new List<int>();
+        private VideoLoader videoL;
+        private Calculate calculate;
+        private Boundary boundary;
+        private bool SF5 = false;
+        private int SF5selectY = 62;
+        private bool manualSelect = false;
 
-        public CancellationTokenSource cancellationTokenSource;
-
-        public string filePath = null;
-        public int selectedY = 0;
-        public int selectedYfix = 0;
+        private string filePath = null;
+        private int selectedY = 0;
+        private int selectedYfix = 0;
         public HPBarForm() {
             InitializeComponent();
-            videoL = new VideoLoader(this);
-            boundary = new Boundary(this);
-            caliculate = new Caliculate(this);
+            videoL = new VideoLoader(() => pictureBoxFrame.Width);
+            boundary = new Boundary(videoL);
+            boundary.OnMessage += msg => MessageBox.Show(msg, "HealthBar", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            calculate = new Calculate(videoL);
 
 
 
@@ -74,7 +62,7 @@ namespace HealthBar {
                 Bitmap frame = videoL.GetFrameRead(0);
                 FrameBox.Text = ($"Frame:0");
                 if (frame != null) {
-                    pictureBoxFrame.Image = frame;
+                    SetDisplayFrame(frame);
                     //trackBarFrameのMax設定
                     trackBarFrame.Minimum = 0;
                     trackBarFrame.Maximum = videoL.TotalFrames - 1;
@@ -122,11 +110,10 @@ namespace HealthBar {
                 }
             } else {
                 //境界線を探す
-                gradients = caliculate.Gradient1(trackBarFrame.Value, selectedY);
+                var gradients = calculate.Gradient1(trackBarFrame.Value, selectedY);
                 boundaries = boundary.FindBoundary(gradients);
                 if (SF5) {
                     boundaries = boundary.FindBoundarySF5(trackBarFrame.Value, selectedY);
-                    Console.WriteLine(boundary.ToString());
                 }
             }
             if (boundaries.Count == 4) {
@@ -191,8 +178,13 @@ namespace HealthBar {
             }
 
         }
-        public void UpdateHPDisplay() {
+        private void UpdateHPDisplay() {
             pictureBoxFrame.Invalidate();
+        }
+
+        private void SetDisplayFrame(Bitmap newFrame) {
+            pictureBoxFrame.Image?.Dispose();
+            pictureBoxFrame.Image = newFrame;
         }
 
         public void PictureBoxBW_MouseClick(object sender, MouseEventArgs e) {
@@ -201,7 +193,7 @@ namespace HealthBar {
 
 
         public void TrackBarFrame_Scroll(object sender, EventArgs e) {
-            pictureBoxFrame.Image = videoL.GetFrameRead(trackBarFrame.Value);
+            SetDisplayFrame(videoL.GetFrameRead(trackBarFrame.Value));
             FrameBox.Text = ($"Frame:{videoL.currentframe.ToString()}");
         }
 
@@ -216,22 +208,30 @@ namespace HealthBar {
 
         public async void CaliculateAllFramesB_Click(object sender, EventArgs e) {
             var progress = new Progress<int>(percent => this.progressBar.Value = percent);
-            await boundary.CaliculateAllFrameHP(progress);
+            var result = await boundary.CaliculateAllFrameHP(progress, SF5, selectedY);
+            if (result != null) {
+                lastAnalysisResult = result;
+                healthPercents1P = result.HP1P;
+                healthPercents2P = result.HP2P;
+                errorList = result.Errors;
+                UpdateHPDisplay();
+            }
         }
 
         public void SaveToCSVB_Click(object sender, EventArgs e) {
+            if (lastAnalysisResult == null) {
+                MessageBox.Show("解析結果がありません。先に解析を実行してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             string directoryPath = Path.GetDirectoryName(filePath);
             string originalFileName = Path.GetFileNameWithoutExtension(filePath);
             string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             string csvFileName = $"{originalFileName}_{timestamp}.csv";
             string csvFilePath = Path.Combine(directoryPath, csvFileName);
-            boundary.SaveHPPercentagesToCSV(csvFilePath);
+            boundary.SaveHPPercentagesToCSV(csvFilePath, lastAnalysisResult);
             listBox.Items.Add($"保存先:{directoryPath},保存名:{csvFileName}");
         }
 
-        private void pictureBoxFrame_Click(object sender, EventArgs e) {
-
-        }
 
 
         private void btnPlay_Click(object sender, EventArgs e) {
@@ -244,9 +244,7 @@ namespace HealthBar {
 
         private void timerFramePlay_Tick(object sender, EventArgs e) {
             if ((trackBarFrame.Value < videoL.TotalFrames - 1)) {
-                pictureBoxFrame.Image.Dispose();
-                Bitmap frame = videoL.GetFrameRead(trackBarFrame.Value);
-                pictureBoxFrame.Image = frame;
+                SetDisplayFrame(videoL.GetFrameRead(trackBarFrame.Value));
                 trackBarFrame.Value++;
             } else {
                 timerFramePlay.Enabled = false;

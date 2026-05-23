@@ -79,8 +79,7 @@
             this.pictureBoxFrame.Size = new System.Drawing.Size(1280, 295);
             this.pictureBoxFrame.TabIndex = 4;
             this.pictureBoxFrame.TabStop = false;
-            this.pictureBoxFrame.Click += new System.EventHandler(this.pictureBoxFrame_Click);
-            // 
+            //
             // trackBarFrame
             // 
             this.trackBarFrame.Location = new System.Drawing.Point(463, 341);

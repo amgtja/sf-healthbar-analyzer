@@ -1,39 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenCvSharp;
 
 namespace HealthBar {
-    public class VideoLoader {
-        public VideoCapture capture;
-        public HPBarForm form;
-        public int TotalFrames { get; set; }
+    public class VideoLoader : IFrameReader {
+        private VideoCapture capture;
+        private readonly Func<int> getDisplayWidth;
+        public int TotalFrames { get; private set; }
         public int currentframe = -1;
-        public Bitmap originalBitmap;
-        public Bitmap scaledBitmap;
-        public VideoLoader(HPBarForm form) {
-            this.form = form;
-        }
 
-        //動画ファイルを読み込むメソッド
+        public VideoLoader(Func<int> getDisplayWidth) {
+            this.getDisplayWidth = getDisplayWidth;
+        }
 
         public bool LoadVideo(string filePath) {
             capture = new VideoCapture(filePath);
-
-            //動画ファイルの読み込み確認
-            if (!capture.IsOpened()) { return false; } else {
-                TotalFrames = (int)capture.FrameCount;
-                currentframe = -1;
-                return true;
-            }
+            if (!capture.IsOpened()) { return false; }
+            TotalFrames = (int)capture.FrameCount;
+            currentframe = -1;
+            return true;
         }
 
         public Bitmap GetFrameRead(int framenumber) {
-
-            //例外処理
             if (capture == null) {
                 throw new InvalidOperationException("動画がロードされていません");
             }
@@ -52,12 +40,14 @@ namespace HealthBar {
                 }
             }
         }
-        public Bitmap ScaledDisplay(Bitmap frame) {
-            if (frame == null) return null;
-            originalBitmap = frame;
-            scaledBitmap = new Bitmap(originalBitmap, form.pictureBoxFrame.Width, 720);
-            return scaledBitmap;
-        }
 
+        private Bitmap ScaledDisplay(Bitmap source) {
+            if (source == null) return null;
+            int targetWidth = getDisplayWidth();
+            int targetHeight = (int)(source.Height * ((double)targetWidth / source.Width));
+            var scaled = new Bitmap(source, targetWidth, targetHeight);
+            source.Dispose();
+            return scaled;
+        }
     }
 }
